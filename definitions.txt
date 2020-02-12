@@ -1,4 +1,15 @@
-# General
+# Energy
+
+# Values from
+# https://cngcenter.com/wp-content/uploads/2013/09/UnitsAndConversions.pdf
+
+# Defined in https://github.com/hgrecco/pint/blob/master/pint/default_en.txt:
+# - tonne_of_oil_equivalent
+
+tonne_of_coal_equivalent = 29.308 GJ = tce
+
+
+# Currency
 
 # Based on Germany's GDP deflator, data from
 # https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?end=2015&locations=DE&start=2000
@@ -11,7 +22,8 @@ EUR_2000 = 0.94662 * EUR_2005 = €_2000
 
 USD_2005 = 1.2435 * EUR_2005 = USD = $_2005
 
-# For model.transport
+
+# Transportation activity
 
 vehicle = [vehicle] = v
 passenger = [passenger] = p = pass
