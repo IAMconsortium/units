@@ -15,5 +15,23 @@ and may be used for research in the fields of:
 - transportation;
 - or others.
 
+## Usage
+
+```python
+>>> import pint
+
+>>> ureg = pint.UnitRegistry()
+>>> ureg.load_definitions('definitions.txt')
+
+>>> qty = ureg('1.2 tce')
+>>> qty
+1.2 <Unit('tonne_of_coal_equivalent')>
+
+>>> qty.to('GJ')
+29.308 <Unit('gigajoule')>
+```
+
+## Tests
+
 Use `pytest test.py` to check that the definitions can be loaded.
 Example unit expressions in `checks.csv` are also checked.
