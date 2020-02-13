@@ -1,0 +1,12 @@
+# Units to check
+#
+# Columns are:
+#
+# 1. A literal string to be parsed as a unit.
+# 2. Expected dimensionality of the parsed unit.
+# 3. Any string, e.g. '*' if the units are not in pint's default_en.txt, but
+#    are defined in definitions.txt.
+#
+toe,  [energy],
+tce,  [energy], *
+GW a, [energy],
