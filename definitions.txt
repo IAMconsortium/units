@@ -8,6 +8,9 @@
 
 tonne_of_coal_equivalent = 29.308 GJ = tce
 
+# Watt-annual
+watt_annual = watt * year = Wa = wattannual
+
 
 # Currency
 
