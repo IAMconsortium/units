@@ -19,6 +19,7 @@ Wa = watt * year
 
 EUR_2005 = [currency] = EUR = €_2005
 EUR_2000 = 0.94662 * EUR_2005 = €_2000
+EUR_2010 = 1.05677 * EUR_2005 = €_2010
 
 # Exchange rate EUR/USD in 2005, data from
 # https://www.statista.com/statistics/412794/euro-to-u-s-dollar-annual-average-exchange-rate/
