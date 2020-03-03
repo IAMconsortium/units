@@ -23,7 +23,7 @@ EUR_2000 = 0.94662 * EUR_2005 = €_2000
 # Exchange rate EUR/USD in 2005, data from
 # https://www.statista.com/statistics/412794/euro-to-u-s-dollar-annual-average-exchange-rate/
 
-USD_2005 = 1.2435 * EUR_2005 = USD = $_2005
+USD_2005 = 0.80418 * EUR_2005 = USD = $_2005
 
 
 # Transportation activity
