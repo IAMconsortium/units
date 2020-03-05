@@ -18,8 +18,8 @@ Wa = watt * year
 # https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?end=2015&locations=DE&start=2000
 
 EUR_2005 = [currency] = EUR
-EUR_2005 = 0.9466 * EUR_2000
-EUR_2005 = 1.0567 * EUR_2010
+EUR_2000 = 1.0564 * EUR_2005
+EUR_2010 = 0.9463 * EUR_2005
 
 # Exchange rate EUR/USD in 2005, data from
 # https://data.oecd.org/conversion/exchange-rates.htm
