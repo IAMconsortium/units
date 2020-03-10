@@ -1,4 +1,4 @@
-# Unit definitions for IA research
+# Unit definitions for integrated-assessment research
 
 © 2020 [IAMC members](http://www.globalchange.umd.edu/iamc/members/);
 licensed under the [Creative Commons Attribution 4.0 license](https://creativecommons.org/licenses/by/4.0/).
@@ -7,6 +7,8 @@ licensed under the [Creative Commons Attribution 4.0 license](https://creativeco
 These definitions are used by:
 
 - the IIASA Energy Program [MESSAGEix-GLOBIOM](https://message.iiasa.ac.at) integrated assessment model (IAM),
+- the Python package [pyam](https://pyam-iamc.readthedocs.io) for analysis and visualization of integrated-assessment scenarios  
+  (see [IamDataFrame.convert_unit()](https://pyam-iamc.readthedocs.io/en/latest/api.html#pyam.IamDataFrame.convert_unit) for details)
 
 and may be used for research in integrated assessment, energy systems, transportation, or other, related fields.
 
