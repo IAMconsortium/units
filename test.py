@@ -24,7 +24,7 @@ with open(Path(__file__).with_name('checks.csv')) as f:
 
         # Convert second column to a dimensionality object
         dims = {dims: 1} if dims.startswith('[') else eval(dims)
-        dims = defaults.get_dimensionality(UnitsContainer(dims))
+        dims = UnitsContainer(dims)
 
         # Convert third column to boolean
         new_def = len(new_def) > 0
@@ -48,6 +48,9 @@ def test_units(registry, unit_str, dim, new_def):
         # Units defined in dimensions.txt are not recognized by base pint
         with pytest.raises(pint.UndefinedUnitError):
             defaults('1 ' + unit_str)
+
+    # Physical quantity of units is recognized
+    dim = registry.get_dimensionality(dim)
 
     # Units can be parsed and have the correct dimensionality
     assert registry('1 ' + unit_str).dimensionality == dim
