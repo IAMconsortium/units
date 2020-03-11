@@ -38,3 +38,24 @@ tkm = tonne_freight * kilometer
 @alias vkm = vkt = v km
 @alias pkm = pkt = p km
 @alias tkm = tkt = t km
+
+
+# Emissions of various greenhouse gases
+
+# DO NOT ADD carbon-dioxide-equivalent conversion factors in this file!
+# 'Global warming potential (GWP)' factors to convert to CO2-equivalents
+# changed between IPCC reports and their values depend on the assumed timespan.
+
+carbon_dioxide = [carbon_dioxide] = co2 = CO2
+
+carbon_monoxide = [carbon_monoxide] = co = CO
+
+methane = [methane] = ch4 = CH4
+
+nitrous_oxide = [nitrous_oxide] = n2o = N2O
+
+nitrogen_oxides = [nitrogen_oxides] = nox = NOx
+
+ammonia = [ammonia] = nh3 = NH3
+
+sulfur = [sulfur] = S
