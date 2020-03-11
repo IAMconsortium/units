@@ -56,27 +56,11 @@ def test_units(registry, unit_str, dim, new_def):
     assert registry('1 ' + unit_str).dimensionality == dim
 
 
-def test_gwp(registry):
-    CH4_emi = registry('1 tonne')
+@pytest.mark.parametrize('context, value', [('AR5GWP100', 28)])
+def test_units_emissions(registry, context, value):
+    # The registry shouldn't convert with specifying a valid context
+    with pytest.raises(pint.DimensionalityError):
+        registry['ch4'].to('co2')
 
-    # Using the gwp_default context.
-    as_temp = CH4_emi.to('K', 'gwp', a='a_CH4')
-    CO2_eq = as_temp.to('tonne', 'gwp', a='a_CO2')
-
-    assert CO2_eq / CH4_emi == 28.
-
-    # Using the gwp_b context
-    as_temp = CH4_emi.to('K', 'gwp_b', a='a_CH4')
-    CO2_eq = as_temp.to('tonne', 'gwp_b', a='a_CO2')
-
-    assert CO2_eq / CH4_emi == 34.
-
-    # Packages consuming IAMconsortium/units may define wrapper/convenience
-    # code like
-    def CO2_eq(qty, from_species='GWP', gwp='default'):
-        return qty.to('K', f'gwp_{gwp}', a=f'a_{from_species}') \
-                  .to(qty.units, f'gwp_{gwp}', a=f'a_CO2')
-
-    emi = registry('1 kg')
-    assert CO2_eq(emi, 'CH4') == registry('28 kg')  # NB units are preserved
-    assert CO2_eq(emi, 'CH4', 'b') == registry('34 kg')
+    assert registry['ch4'].to('co2', context).magnitude == value
+    assert registry['Mt ch4'].to('Mt co2', context).magnitude == value

@@ -1,0 +1,6 @@
+@context AR5GWP100
+    [methane] -> [carbon_dioxide]: value * 28 * co2 / ch4
+    [methane] * [mass] -> [carbon_dioxide] * [mass]: value * 28 * co2 / ch4
+    [carbon_dioxide] -> [methane]: value / 28 / co2 * ch4
+    [carbon_dioxide] * [mass] -> [methane] * [mass]: value / 28 / co2 * ch4
+@end
