@@ -24,6 +24,9 @@ ammonia = [ammonia] = nh3 = NH3
 
 sulfur = [sulfur] = S
 
-# Using contexts to define conversions to co2-equivalents (=co2)
+# Importing contexts to define conversions to co2-equivalents (=co2)
+# see the README of this module for more information
 
-@import ar5_gwp100.txt
+@import gwp_AR5GWP100.txt
+@import gwp_AR4GWP100.txt
+@import gwp_SARGWP100.txt

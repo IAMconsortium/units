@@ -56,7 +56,10 @@ def test_units(registry, unit_str, dim, new_def):
     assert registry('1 ' + unit_str).dimensionality == dim
 
 
-@pytest.mark.parametrize('context, value', [('AR5GWP100', 28)])
+@pytest.mark.parametrize('context, value',
+                         [('AR5GWP100', 28),
+                          ('AR4GWP100', 25),
+                          ('SARGWP100', 21)])
 def test_units_emissions(registry, context, value):
     # The registry shouldn't convert with specifying a valid context
     with pytest.raises(pint.DimensionalityError):
