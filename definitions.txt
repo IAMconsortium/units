@@ -59,3 +59,31 @@ nitrogen_oxides = [nitrogen_oxides] = nox = NOx
 ammonia = [ammonia] = nh3 = NH3
 
 sulfur = [sulfur] = S
+
+# Demonstration using contexts
+
+# Pint currently allows redefining units/constants inside a context, but not
+
+# defining new ones. These values are used in gwp_default. NB the values are
+
+# artificial.
+a_CO2 = 1 * kelvin / tonne
+a_CH4 = 28 * kelvin / tonne
+
+@context(a=0) gwp_default = gwp
+    [mass] -> [temperature]: value * a
+    [temperature] -> [mass]: value / a
+@end
+
+# A second context providing different conversions via different constants.
+
+# '_b' here could be expanded into a naming scheme for different groups.
+@context(a=0) gwp_b
+    # Redefine one of the constants
+    a_CH4 = 34 * kelvin / tonne
+
+    # Pint requires redefinition of these conversions; a little verbose, but
+    # harmless.
+    [mass] -> [temperature]: value * a
+    [temperature] -> [mass]: value / a
+@end
