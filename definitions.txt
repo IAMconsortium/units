@@ -47,7 +47,10 @@ tkm = tonne_freight * kilometer
 # changed between IPCC reports and their values depend on the assumed timespan.
 
 carbon_dioxide = [carbon_dioxide] = co2 = CO2
-# molecular weight of carbon dioxide to that of carbon: 44/12
+
+# in the context of emissions, concentrations and resulting radiative forcing,
+# carbon and carbon dioxide are usually treated as equivalent 
+# multiplied by the molecular weight of carbon dioxide relative to carbon
 carbon = 44/12 * co2 = C
 
 carbon_monoxide = [carbon_monoxide] = co = CO
