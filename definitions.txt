@@ -42,52 +42,6 @@ tkm = tonne_freight * kilometer
 
 # Emissions of various greenhouse gases
 
-# DO NOT ADD carbon-dioxide-equivalent conversion factors in this file!
-# 'Global warming potential (GWP)' factors to convert to CO2-equivalents
-# changed between IPCC reports and their values depend on the assumed timespan.
+# please add any emissions-related definitions to modules/emissions
 
-carbon_dioxide = [carbon_dioxide] = co2 = CO2
-# in the context of emissions, concentrations and resulting radiative forcing,
-# carbon and carbon dioxide are usually treated as equivalent
-# multiplied by the molecular weight of carbon dioxide relative to carbon
-carbon = 44/12 * co2 = C
-
-carbon_monoxide = [carbon_monoxide] = co = CO
-
-methane = [methane] = ch4 = CH4
-
-nitrous_oxide = [nitrous_oxide] = n2o = N2O
-
-nitrogen_oxides = [nitrogen_oxides] = nox = NOx
-
-ammonia = [ammonia] = nh3 = NH3
-
-sulfur = [sulfur] = S
-
-# Demonstration using contexts
-
-# Pint currently allows redefining units/constants inside a context, but not
-
-# defining new ones. These values are used in gwp_default. NB the values are
-
-# artificial.
-a_CO2 = 1 * kelvin / tonne
-a_CH4 = 28 * kelvin / tonne
-
-@context(a=0) gwp_default = gwp
-    [mass] -> [temperature]: value * a
-    [temperature] -> [mass]: value / a
-@end
-
-# A second context providing different conversions via different constants.
-
-# '_b' here could be expanded into a naming scheme for different groups.
-@context(a=0) gwp_b
-    # Redefine one of the constants
-    a_CH4 = 34 * kelvin / tonne
-
-    # Pint requires redefinition of these conversions; a little verbose, but
-    # harmless.
-    [mass] -> [temperature]: value * a
-    [temperature] -> [mass]: value / a
-@end
+@import modules/emissions/emissions.txt
