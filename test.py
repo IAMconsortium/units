@@ -66,5 +66,11 @@ def test_units_emissions(registry, context, value):
         registry['ch4'].to('co2')
 
     context = f'gwp_{context}'
+
+    # assert that conversion to CO2 works
     assert registry['ch4'].to('co2', context).magnitude == value
     assert registry['Mt ch4'].to('Mt co2', context).magnitude == value
+
+    # assert that conversion to CO2-equivalent works
+    assert registry['ch4'].to('co2e', context).magnitude == value
+    assert registry['Mt ch4'].to('Mt co2e', context).magnitude == value
