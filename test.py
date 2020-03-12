@@ -72,7 +72,9 @@ def test_units_emissions(registry, context, value):
 
     for f in formats:
         # assert that conversion to CO2 works
-        assert registry[f.format('ch4')].to('co2', context).magnitude == value
+        assert registry[f.format('ch4')].to(f.format('co2'),
+                                            context).magnitude == value
 
         # assert that conversion to CO2-equivalent works
-        assert registry[f.format('ch4')].to('co2e', context).magnitude == value
+        assert registry[f.format('ch4')].to(f.format('co2e'),
+                                            context).magnitude == value
