@@ -1,13 +1,19 @@
 @context gwp_SARGWP100 
  
     [methane] -> [carbon_dioxide]: value * 21.0 * CO2 / CH4 
-    [methane] * [mass] -> [carbon_dioxide] * [mass]: value * 21.0 * CO2 / CH4 
-    [carbon_dioxide] -> [methane]: value / 21.0 / CO2 * ch4 
-    [carbon_dioxide] * [mass] -> [methane] * [mass]: value / 21.0 / CO2 * CH4 
- 
+    [carbon_dioxide] -> [methane]: value / 21.0 / CO2 * CH4 
+    [mass] * [methane] -> [mass] * [carbon_dioxide]: value * 21.0 * CO2 / CH4 
+    [mass] * [carbon_dioxide] -> [mass] * [methane]: value / 21.0 / CO2 * CH4 
+    [mass] * [methane] / [time] -> [mass] * [carbon_dioxide] / [time]: value * 21.0 * CO2 / CH4 
+    [mass] * [carbon_dioxide] / [time] -> [mass] * [methane] / [time]: value / 21.0 / CO2 * CH4 
+    [methane] / [time] -> [carbon_dioxide] / [time]: value * 21.0 * CO2 / CH4 
+    [carbon_dioxide] / [time] -> [methane] / [time]: value / 21.0 / CO2 * CH4 
     [nitrous_oxide] -> [carbon_dioxide]: value * 310.0 * CO2 / N2O 
-    [nitrous_oxide] * [mass] -> [carbon_dioxide] * [mass]: value * 310.0 * CO2 / N2O 
-    [carbon_dioxide] -> [nitrous_oxide]: value / 310.0 / CO2 * ch4 
-    [carbon_dioxide] * [mass] -> [nitrous_oxide] * [mass]: value / 310.0 / CO2 * N2O 
- 
+    [carbon_dioxide] -> [nitrous_oxide]: value / 310.0 / CO2 * N2O 
+    [mass] * [nitrous_oxide] -> [mass] * [carbon_dioxide]: value * 310.0 * CO2 / N2O 
+    [mass] * [carbon_dioxide] -> [mass] * [nitrous_oxide]: value / 310.0 / CO2 * N2O 
+    [mass] * [nitrous_oxide] / [time] -> [mass] * [carbon_dioxide] / [time]: value * 310.0 * CO2 / N2O 
+    [mass] * [carbon_dioxide] / [time] -> [mass] * [nitrous_oxide] / [time]: value / 310.0 / CO2 * N2O 
+    [nitrous_oxide] / [time] -> [carbon_dioxide] / [time]: value * 310.0 * CO2 / N2O 
+    [carbon_dioxide] / [time] -> [nitrous_oxide] / [time]: value / 310.0 / CO2 * N2O 
 @end

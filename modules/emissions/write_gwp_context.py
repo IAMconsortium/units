@@ -2,6 +2,14 @@ import pandas as pd
 
 context = 'SARGWP100'
 
+# add explicit conversion mappings for derived units (with time & mass)
+formatters = [
+    "[{}]",
+    "[mass] * [{}]",
+    "[mass] * [{}] / [time]",
+    "[{}] / [time]",
+]
+
 # load data from table, drop all rows that don't have defined species
 # the species must match the base unit in `emissions.txt`
 data = (
@@ -21,14 +29,13 @@ gwp = open(f'gwp_{context}.txt', 'w')
 gwp.writelines(f'@context gwp_{context} \n \n')
 
 for i, (species, symbol, value) in data.iterrows():
-    gwp.write(
-        f'    [{species}] -> [carbon_dioxide]: value * {value} * CO2 / {symbol} \n')
-    gwp.write(
-        f'    [{species}] * [mass] -> [carbon_dioxide] * [mass]: value * {value} * CO2 / {symbol} \n')
-    gwp.write(
-        f'    [carbon_dioxide] -> [{species}]: value / {value} / CO2 * ch4 \n')
-    gwp.write(
-        f'    [carbon_dioxide] * [mass] -> [{species}] * [mass]: value / {value} / CO2 * {symbol} \n \n')
+    for f in formatters:
+        f_species = f.format(species)
+        f_co2 = f.format('carbon_dioxide')
+        gwp.write(
+            f'    {f_species} -> {f_co2}: value * {value} * CO2 / {symbol} \n')
+        gwp.write(
+            f'    {f_co2} -> {f_species}: value / {value} / CO2 * {symbol} \n')
 
 gwp.write('@end')
 gwp.close()
