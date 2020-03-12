@@ -20,7 +20,9 @@ of `emissions.txt` and write a unit test.
 ## Source of CO-equivalent conversion factors
 
 The conversion factors to CO2-equivalent are parsed from the file `metric_conversions.csv`,
-which was created by [lewisjared](https://github.com/lewisjared) and licensed under BSD-3.
+which was created by [lewisjared](https://github.com/lewisjared),
+[swillner](https://github.com/swillner) & [znicholls](https://github.com/znicholls)
+and licensed under BSD-3.
 See [lewisjared/scmdata v0.4](https://github.com/lewisjared/scmdata/tree/v0.4.0/src/scmdata/data)
 for the original file.
 
