@@ -12,5 +12,10 @@ tce,  [energy], *
 GW a, [energy],
 kWa,  [energy], *
 EUR_2005, [currency], *
-CO2,    [carbon_dioxide], *
+CO2,  [carbon_dioxide], *
+CO2e, [carbon_dioxide], *
+CO2_equivalent, [carbon_dioxide], *
+# C is overwritten by `emissions.txt`, therefore no '*' in third column
+C, [carbon_dioxide],
+CH4,  [methane], *
 nh3,  [ammonia], *
