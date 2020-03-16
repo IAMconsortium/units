@@ -54,3 +54,27 @@ def test_units(registry, unit_str, dim, new_def):
 
     # Units can be parsed and have the correct dimensionality
     assert registry('1 ' + unit_str).dimensionality == dim
+
+
+@pytest.mark.parametrize('context, value',
+                         [('AR5GWP100', 28),
+                          ('AR4GWP100', 25),
+                          ('SARGWP100', 21)])
+def test_units_emissions(registry, context, value):
+    # The registry shouldn't convert with specifying a valid context
+    with pytest.raises(pint.DimensionalityError):
+        registry['ch4'].to('co2')
+
+    context = f'gwp_{context}'
+
+    # test commonly used erived units related to emissions
+    formats = ['{}', 'Mt {}', 'Mt {} / yr', '{} / yr']
+
+    for f in formats:
+        # assert that conversion to CO2 works
+        assert registry[f.format('ch4')].to(f.format('co2'),
+                                            context).magnitude == value
+
+        # assert that conversion to CO2-equivalent works
+        assert registry[f.format('ch4')].to(f.format('co2e'),
+                                            context).magnitude == value

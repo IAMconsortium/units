@@ -30,6 +30,15 @@ and may be used for research in integrated assessment, energy systems, transport
 
 This repository can be included in others as a [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 
+## Warnings
+
+By loading `definitions.txt`, the following changes will be made to the
+default-definitions of a `pint.UnitRegistry`.
+
+| Default `pint` usage | New usage     | Notes                                                 |
+| -------------------- | ------------- | ----------------------------------------------------- |
+| `C`: Coulomb         | `C`: carbon   | See `modules/emissions/emissions.txt#L10` for details |
+
 ## Tests
 
 Use `pytest test.py` to check that the definitions can be loaded.
