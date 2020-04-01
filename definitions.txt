@@ -15,7 +15,7 @@ Wa = watt * year
 # Currency
 
 # Based on Germany's GDP deflator, data from
-# https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?end=2015&locations=DE&start=2000
+# https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=DE
 
 EUR_2005 = [currency] = EUR
 EUR_2000 = 1.0564 * EUR_2005
@@ -25,6 +25,11 @@ EUR_2010 = 0.9463 * EUR_2005
 # https://data.oecd.org/conversion/exchange-rates.htm
 
 USD_2005 = 0.8038 * EUR_2005 = USD
+
+# United States' GDP deflator, data from
+# https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US
+
+USD_2010 = USD_2005 * 83.426 / 91.718
 
 
 # Transportation activity
