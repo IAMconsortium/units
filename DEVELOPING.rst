@@ -1,6 +1,20 @@
 Development notes
 *****************
 
+The repository and package aim to be ruthlessly simple, and thus as easy as possible to maintain.
+Thus:
+
+- No built documentation; like `pycountry <https://pypi.org/project/pycountry/>`_, the README *is* the documentation.
+- Actual code (in \_\_init\_\_.py) kept to a minimum.
+- `setuptools-scm <https://pypi.org/project/setuptools-scm/>`_ and git tags used for all versioning.
+- Minimal CI configuration: one service/OS/Python version.
+
+
+Versioning
+==========
+Similar to pycountry: ``<YYYY>.<M>.<D>``.
+
+
 Test the package build
 ======================
 
