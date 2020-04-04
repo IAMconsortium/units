@@ -3,8 +3,9 @@ from pathlib import Path
 
 import pint
 from pint.util import UnitsContainer
-
 import pytest
+
+from iam_units import registry
 
 
 DATA_PATH = Path(__file__).parent / 'data'
@@ -34,17 +35,9 @@ with open(DATA_PATH / 'checks.csv') as f:
         PARAMS.append((unit_str, dims, new_def))
 
 
-@pytest.fixture(scope='session')
-def registry():
-    """UnitRegistry including definitions from definitions.txt."""
-    reg = pint.UnitRegistry()
-    reg.load_definitions(str(DATA_PATH / 'definitions.txt'))
-    yield reg
-
-
 @pytest.mark.parametrize('unit_str, dim, new_def', PARAMS,
                          ids=lambda v: v if isinstance(v, str) else '')
-def test_units(registry, unit_str, dim, new_def):
+def test_units(unit_str, dim, new_def):
     if new_def:
         # Units defined in dimensions.txt are not recognized by base pint
         with pytest.raises(pint.UndefinedUnitError):
@@ -61,7 +54,7 @@ def test_units(registry, unit_str, dim, new_def):
                          [('AR5GWP100', 28),
                           ('AR4GWP100', 25),
                           ('SARGWP100', 21)])
-def test_units_emissions(registry, context, value):
+def test_units_emissions(context, value):
     # The registry shouldn't convert with specifying a valid context
     with pytest.raises(pint.DimensionalityError):
         registry['ch4'].to('co2')
