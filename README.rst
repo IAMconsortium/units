@@ -1,13 +1,13 @@
 Unit definitions for integrated-assessment research
 ***************************************************
 
-© 2020 `IAMC members`_; licensed under the `Creative Commons Attribution 4.0 license <CC-BY>`_.
+© 2020 `IAMC members`_; licensed under the `Creative Commons Attribution 4.0 license`_.
 
 The file `definitions.txt`_ gives `Pint`_-compatible definitions of energy, climate, and related units to supplement the SI and other units included in Pint's `default_en.txt`_.
 These definitions are used by:
 
 - the IIASA Energy Program `MESSAGEix-GLOBIOM`_ integrated assessment model (IAM),
-- the Python package `pyam`_ for analysis and visualization of integrated-assessment scenarios (see `pyam.IamDataFrame.convert_unit() <pyam-convert_unit>`_ for details)
+- the Python package `pyam`_ for analysis and visualization of integrated-assessment scenarios (see `pyam.IamDataFrame.convert_unit()`_ for details)
 
 and may be used for research in integrated assessment, energy systems, transportation, or other, related fields.
 (Please open a `pull request`_ to add your usage to this README!)
@@ -92,17 +92,14 @@ To use one of these contexts, give its name as the second argument to the ``pint
 Data sources
 ~~~~~~~~~~~~
 The GWP unit definitions are generated using the file metric_conversions.csv.
-The file is copied from `lewisjared/scmdata v0.4 <scmdata-0.4>`_, authored by `@lewisjared <lewisjared>`_, `@swillner <swillner>`_, and `@znicholls <znicholls>`_ and licensed under BSD-3.
-The version in scmdata was transcribed from `this source <GWP source>`_ (PDF link).
+The file is copied from `lewisjared/scmdata`_ v0.4, authored by `@lewisjared <https://github.com/lewisjared>`_, `@swillner <https://github.com/swillner>`_, and `@znicholls <https://github.com/znicholls>`_ and licensed under BSD-3.
+The version in scmdata was transcribed from `this source`_ (PDF link).
 
 See `<DEVELOPING.rst>`_ for details on updating the definitions.
 
 .. _contexts: https://pint.readthedocs.io/en/latest/contexts.html
-.. _scmdata-0.4: https://github.com/lewisjared/scmdata/tree/v0.4.0/src/scmdata/data
-.. _lewisjared: https://github.com/lewisjared
-.. _swillner: https://github.com/swillner
-.. _znicholls: https://github.com/znicholls
-.. _GWP source: https://www.ghgprotocol.org/sites/default/files/ghgp/Global-Warming-Potential-Values%20%28Feb%2016%202016%29_1.pdf
+.. _lewisjared/scmdata: https://github.com/lewisjared/scmdata/tree/v0.4.0/src/scmdata/data
+.. _this source: https://www.ghgprotocol.org/sites/default/files/ghgp/Global-Warming-Potential-Values%20%28Feb%2016%202016%29_1.pdf
 
 
 Tests and development
@@ -113,7 +110,7 @@ Example unit expressions in `checks.csv`_ are also checked.
 See `<DEVELOPING.rst>`_ for further details.
 
 .. _IAMC members: http://www.globalchange.umd.edu/iamc/members/
-.. _CC-BY: https://creativecommons.org/licenses/by/4.0/
+.. _Creative Commons Attribution 4.0 license: https://creativecommons.org/licenses/by/4.0/
 .. _definitions.txt: ./iam_units/data/definitions.txt
 .. _emissions.txt: ./iam_units/data/emissions/emissions.txt
 .. _checks.csv: ./iam_units/data/checks.csv
@@ -121,5 +118,5 @@ See `<DEVELOPING.rst>`_ for further details.
 .. _default_en.txt: https://github.com/hgrecco/pint/blob/master/pint/default_en.txt
 .. _MESSAGEix-GLOBIOM: https://message.iiasa.ac.at
 .. _pyam: https://pyam-iamc.readthedocs.io
-.. _pyam-convert_unit: https://pyam-iamc.readthedocs.io/en/latest/api.html#pyam.IamDataFrame.convert_unit
+.. _pyam.IamDataFrame.convert_unit(): https://pyam-iamc.readthedocs.io/en/latest/api.html#pyam.IamDataFrame.convert_unit
 .. _pull request: https://github.com/IAMconsortium/units/pulls
