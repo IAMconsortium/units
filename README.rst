@@ -7,7 +7,7 @@ The file `definitions.txt`_ gives `Pint`_-compatible definitions of energy, clim
 These definitions are used by:
 
 - the IIASA Energy Program `MESSAGEix-GLOBIOM`_ integrated assessment model (IAM),
-- the Python package `pyam`_ for analysis and visualization of integrated-assessment scenarios (see `IamDataFrame.convert_unit() <pyam-convert_unit>`_ for details)
+- the Python package `pyam`_ for analysis and visualization of integrated-assessment scenarios (see `pyam.IamDataFrame.convert_unit() <pyam-convert_unit>`_ for details)
 
 and may be used for research in integrated assessment, energy systems, transportation, or other, related fields.
 (Please open a `pull request`_ to add your usage to this README!)
@@ -32,7 +32,8 @@ To make the ``registry`` from this package the default:
 
     >>> import pint
     >>> pint.set_application_registry(registry)
-    # Now used by default
+
+    # Now used by default for pint top-level classes and methods
     >>> pint.Quantity('1.2 tce')
     1.2 <Unit('tonne_of_coal_equivalent')>
 
@@ -50,6 +51,59 @@ Warnings
    - - 'C' = Coulomb
      - 'C' = carbon
      - See `emissions.txt`_ at line 10.
+
+Technical details
+=================
+
+Emissions and GWP
+-----------------
+
+`emissions.txt`_ defines some greenhouse gases (GHGs) as Pint base units.
+Conversion of masses of these GHGs to CO₂ equivalents use selectable global warming potential (GWP) metrics, implemented as Pint `contexts`_ in the other files in the same directory.
+The contexts have names like ``gwp_<IPCC report>GWP<years>``, where ``<years>`` is `100` and:
+
+.. list-table::
+   :header-rows: 1
+
+   - - ``<IPCC report>``
+     - Meaning
+   - - ``SAR``
+     - Second Assessment Report (1995)
+   - - ``AR4``
+     - Fourth Assessment Report (2007)
+   - - ``AR5``
+     - Fifth Assessment Report (2014)
+
+To use one of these contexts, give its name as the second argument to the ``pint.Quantity.to()`` method:
+
+.. code-block:: python
+
+   >>> qty = registry('3.5e3 t N20')
+   >>> qty
+   3500 <Unit('metric_ton * nitrous_oxide')>
+
+   >>> qty.to('Mt CO2', 'gwp_AR4GWP100')
+   0.9275 <Unit('carbon_dioxide * megametric_ton')>
+
+   # Using a different metric
+   >>> qty.to('Mt CO2', 'gwp_SARGWP100')
+   1.085 <Unit('carbon_dioxide * megametric_ton')>
+
+Data sources
+~~~~~~~~~~~~
+The GWP unit definitions are generated using the file metric_conversions.csv.
+The file is copied from `lewisjared/scmdata v0.4 <scmdata-0.4>`_, authored by `@lewisjared <lewisjared>`_, `@swillner <swillner>`_, and `@znicholls <znicholls>`_ and licensed under BSD-3.
+The version in scmdata was transcribed from `this source <GWP source>`_ (PDF link).
+
+See `<DEVELOPING.rst>`_ for details on updating the definitions.
+
+.. _contexts: https://pint.readthedocs.io/en/latest/contexts.html
+.. _scmdata-0.4: https://github.com/lewisjared/scmdata/tree/v0.4.0/src/scmdata/data
+.. _lewisjared: https://github.com/lewisjared
+.. _swillner: https://github.com/swillner
+.. _znicholls: https://github.com/znicholls
+.. _GWP source: https://www.ghgprotocol.org/sites/default/files/ghgp/Global-Warming-Potential-Values%20%28Feb%2016%202016%29_1.pdf
+
 
 Tests and development
 =====================
