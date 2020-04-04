@@ -15,7 +15,7 @@ formatters = [
 # the species must match the base unit in `emissions.txt`
 data = (
     pd.read_csv('metric_conversions.csv')
-        .dropna(subset=['Species'])
+      .dropna(subset=['Species'])
 )
 
 

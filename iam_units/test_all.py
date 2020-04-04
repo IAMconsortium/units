@@ -7,12 +7,13 @@ from pint.util import UnitsContainer
 import pytest
 
 
+DATA_PATH = Path(__file__).parent / 'data'
 defaults = pint.get_application_registry()
 
 
 # Read units to check from file
 PARAMS = []
-with open(Path(__file__).with_name('checks.csv')) as f:
+with open(DATA_PATH / 'checks.csv') as f:
     for row in csv.reader(f, skipinitialspace=True, quoting=csv.QUOTE_MINIMAL):
         try:
             unit_str, dims, new_def = row
@@ -37,7 +38,7 @@ with open(Path(__file__).with_name('checks.csv')) as f:
 def registry():
     """UnitRegistry including definitions from definitions.txt."""
     reg = pint.UnitRegistry()
-    reg.load_definitions(str(Path(__file__).with_name('definitions.txt')))
+    reg.load_definitions(str(DATA_PATH / 'definitions.txt'))
     yield reg
 
 

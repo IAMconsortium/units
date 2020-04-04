@@ -49,4 +49,4 @@ tkm = tonne_freight * kilometer
 
 # please add any emissions-related definitions to modules/emissions
 
-@import modules/emissions/emissions.txt
+@import emissions/emissions.txt
