@@ -14,19 +14,17 @@ and may be used for research in integrated assessment, energy systems, transport
 
 ## Usage
 
-```python
->>> import pint
+    >>> import pint
 
->>> ureg = pint.UnitRegistry()
->>> ureg.load_definitions('definitions.txt')
+    >>> ureg = pint.UnitRegistry()
+    >>> ureg.load_definitions('definitions.txt')
 
->>> qty = ureg('1.2 tce')
->>> qty
-1.2 <Unit('tonne_of_coal_equivalent')>
+    >>> qty = ureg('1.2 tce')
+    >>> qty
+    1.2 <Unit('tonne_of_coal_equivalent')>
 
->>> qty.to('GJ')
-29.308 <Unit('gigajoule')>
-```
+    >>> qty.to('GJ')
+    29.308 <Unit('gigajoule')>
 
 This repository can be included in others as a [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 

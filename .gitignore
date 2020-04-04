@@ -1,4 +1,10 @@
+# Python
+*.egg-info
 __pycache__
 .benchmarks
 .pytest_cache
+build
+dist
+
+# Editors
 .idea/*
