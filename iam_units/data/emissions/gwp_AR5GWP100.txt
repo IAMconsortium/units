@@ -1,4 +1,4 @@
-# This file was created using the script `write_gwp_context.py`
+# This file was generated using python -m iam_units.update emissions
 # DO NOT ALTER THIS FILE MANUALLY!
 
 @context gwp_AR5GWP100

@@ -11,3 +11,12 @@ Test the package build
    $ twine check dist/
 
 Ensure there are no warnings from twine.
+
+
+Generated data files
+====================
+Update these files using the command::
+
+    $ python -m iam_units.update emissions
+
+The files contain a notice that they should not be edited manually.
