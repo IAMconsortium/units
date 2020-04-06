@@ -8,11 +8,8 @@ Thus:
 - Actual code (in \_\_init\_\_.py) kept to a minimum.
 - `setuptools-scm <https://pypi.org/project/setuptools-scm/>`_ and git tags used for all versioning.
 - Minimal CI configuration: one service/OS/Python version.
-
-
-Versioning
-==========
-Similar to pycountry: ``<YYYY>.<M>.<D>``.
+- Versioning: similar to pycountry: ``<YYYY>.<M>.<D>``.
+- AUTHORS: anyone adding a commit to the repo should also add their name to AUTHORS.
 
 
 Test the package build

@@ -1,7 +1,7 @@
 Unit definitions for integrated-assessment research
 ***************************************************
 
-© 2020 `IAMC members`_; licensed under the `Creative Commons Attribution 4.0 license`_.
+© 2020 `IAM-units authors`_; licensed under the `GNU GPL version 3`_.
 
 The file `definitions.txt`_ gives `Pint`_-compatible definitions of energy, climate, and related units to supplement the SI and other units included in Pint's `default_en.txt`_.
 These definitions are used by:
@@ -109,8 +109,8 @@ Use ``pytest iam_units`` to check that the definitions can be loaded.
 Example unit expressions in `checks.csv`_ are also checked.
 See `<DEVELOPING.rst>`_ for further details.
 
-.. _IAMC members: http://www.globalchange.umd.edu/iamc/members/
-.. _Creative Commons Attribution 4.0 license: https://creativecommons.org/licenses/by/4.0/
+.. _IAM-units authors: ./AUTHORS
+.. _GNU GPL version 3: ./LICENSE
 .. _definitions.txt: ./iam_units/data/definitions.txt
 .. _emissions.txt: ./iam_units/data/emissions/emissions.txt
 .. _checks.csv: ./iam_units/data/checks.csv
