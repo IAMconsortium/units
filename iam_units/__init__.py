@@ -2,8 +2,10 @@ from pathlib import Path
 
 import pint
 
+from . import emissions
 
-__all__ = ['convert_gwp', 'registry']
+
+__all__ = ['SPECIES', 'convert_gwp', 'registry']
 
 
 # Package registry using definitions.txt
@@ -19,25 +21,42 @@ def convert_gwp(metric, quantity, *species):
     ----------
     metric : 'SARGWP100' or 'AR4GWP100' or 'AR5GWP100'
         Metric conversion factors to use.
-    quantity : pint.Quantity
+    quantity : str or pint.Quantity
         Quantity to convert.
-    species : (str, str)
-        Input and output emissions species, e.g. ('CH4', 'CO2') to convert
-        mass of CH₄ to GWP-equivalent mass of CO₂.
+    species : sequence of str, length 1 or 2
+        Output, or input and output emissions species, e.g. ('CH4', 'CO2') to
+        convert mass of CH₄ to GWP-equivalent mass of CO₂. If only the output
+        species is provided, *quantity* must contain the name of the input
+        species in some location, e.g. 'tonne CH4'.
 
     Returns
     -------
     pint.Quantity
-        `quantity` converted from `species[0]` to `species[1]`.
+        `quantity` converted from the input to output species.
     """
-    if len(species) != 2:
-        raise ValueError('Must provide (from, to) species')
+    try:
+        species_in, species_out = species
+    except ValueError:
+        if len(species) != 1:
+            raise ValueError('Must provide (from, to) or (to,) species')
+
+        # Only output emissions species provided
+        species_out = species[0]
+
+        # *quantity* contains the input species; extract it
+        q0, species_in, q1 = emissions.pattern.split(quantity, maxsplit=1)
+
+        # Re-assemble the quantity
+        quantity = q0 + q1
+
+    # Maybe convert a string to Quantity; if it's already Quantity, a no-op
+    quantity = registry.Quantity(quantity)
 
     # Units with the same dimensionality as *quantity*, except '[mass]'
-    # replaced with '[_GWP]'
+    # replaced with the dummy units '[_GWP]'
     dummy = quantity.units / registry.Unit('tonne / _gwp')
 
     # Convert to GWP dummy units using 'a' for the input species; then back to
     # the input units using 'a' for the output species.
-    return quantity.to(dummy, metric, _a=f'a_{species[0]}') \
-                   .to(quantity.units, metric, _a=f'a_{species[1]}')
+    return quantity.to(dummy, metric, _a=f'a_{species_in}') \
+                   .to(quantity.units, metric, _a=f'a_{species_out}')
