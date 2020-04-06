@@ -2,10 +2,12 @@
     python -m iam_units.update emissions
 # DO NOT ALTER THIS FILE MANUALLY!
 
-
 @context(_a=NaN) AR4GWP100
-    [mass] -> [_GWP]: value * _a * (_gwp / kg)
-    [_GWP] -> [mass]: value / _a * (kg / _gwp)
+    [mass] -> [_GWP]: value * (_a * _gwp / kg)
+    [_GWP] -> [mass]: value / (_a * _gwp / kg)
+    [mass] / [time] -> [_GWP] / [time]: value * (_a * _gwp / kg)
+    [_GWP] / [time] -> [mass] / [time]: value / (_a * _gwp / kg)
+
 
     a_C2F6 = 12200.0
     a_C3F8 = 8830.0
