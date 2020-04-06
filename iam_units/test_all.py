@@ -64,10 +64,15 @@ def test_kt():
         pint.UnitRegistry()('kt').to('Mt')
 
 
-@pytest.mark.parametrize('context, value',
-                         [('AR5GWP100', 28),
-                          ('AR4GWP100', 25),
-                          ('SARGWP100', 21)])
+# 1 tonne of CH4 converted to CO2 equivalent by different metrics
+EMI_DATA = [
+    ('AR5GWP100', 28),
+    ('AR4GWP100', 25),
+    ('SARGWP100', 21)
+]
+
+
+@pytest.mark.parametrize('context, value', EMI_DATA)
 def test_units_emissions(context, value):
     # The registry shouldn't convert with specifying a valid context
     with pytest.raises(pint.DimensionalityError):
@@ -75,7 +80,7 @@ def test_units_emissions(context, value):
 
     context = f'gwp_{context}'
 
-    # test commonly used erived units related to emissions
+    # test commonly used derived units related to emissions
     formats = ['{}', 'Mt {}', 'Mt {} / yr', '{} / yr']
 
     for f in formats:
@@ -101,8 +106,10 @@ def test_emissions_internal():
         r('0.5 t').to('_gwp')
 
 
-def test_convert_gwp():
+@pytest.mark.parametrize('units', ['t', 'kt', 'Mt', 'Mt / yr'])
+@pytest.mark.parametrize('metric, expected_value', EMI_DATA)
+def test_convert_gwp(units, metric, expected_value):
     # Bare masses can be converted
-    qty = registry('1.0 tonne')
-    expected = registry('28.0 t')
-    assert convert_gwp('AR5GWP100', qty, 'CH4', 'CO2') == expected
+    qty = registry(f'1.0 {units}')
+    expected = registry(f'{expected_value} {units}')
+    assert convert_gwp(metric, qty, 'CH4', 'CO2') == expected
