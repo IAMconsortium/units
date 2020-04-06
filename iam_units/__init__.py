@@ -33,6 +33,11 @@ def convert_gwp(metric, quantity, *species):
     if len(species) != 2:
         raise ValueError('Must provide (from, to) species')
 
-    # Convert
-    return quantity.to('_gwp', metric, _a=f'a_{species[0]}') \
+    # Units with the same dimensionality as *quantity*, except '[mass]'
+    # replaced with '[_GWP]'
+    dummy = quantity.units / registry.Unit('tonne / _gwp')
+
+    # Convert to GWP dummy units using 'a' for the input species; then back to
+    # the input units using 'a' for the output species.
+    return quantity.to(dummy, metric, _a=f'a_{species[0]}') \
                    .to(quantity.units, metric, _a=f'a_{species[1]}')

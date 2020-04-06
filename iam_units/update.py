@@ -15,9 +15,12 @@ _EMI_HEADER = """# This file was generated using:
 """
 
 _EMI_DATA = f"""{_EMI_HEADER}
-@context(_a=NaN) {{context}}
-    [mass] -> [_GWP]: value * _a * (_gwp / kg)
-    [_GWP] -> [mass]: value / _a * (kg / _gwp)
+@context(_a=NaN) {{metric}}
+    [mass] -> [_GWP]: value * (_a * _gwp / kg)
+    [_GWP] -> [mass]: value / (_a * _gwp / kg)
+    [mass] / [time] -> [_GWP] / [time]: value * (_a * _gwp / kg)
+    [_GWP] / [time] -> [mass] / [time]: value / (_a * _gwp / kg)
+
 
     {{defs}}
 @end
@@ -40,7 +43,7 @@ def emissions():
     # Write the file containing the species defs
     with open(data_path / 'species.txt', 'w') as f:
         f.write(_EMI_HEADER + '\n')
-        [f.write(f'a_{s} = NaN\n') for s in data['Symbol'].unique()]
+        [f.write(f'a_{s} = NaN\n') for s in sorted(data['Symbol'].unique())]
 
     # Write one file containing a context for each metric
     for metric, _data in data.groupby('metric'):

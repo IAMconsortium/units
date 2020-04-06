@@ -106,7 +106,7 @@ def test_emissions_internal():
         r('0.5 t').to('_gwp')
 
 
-@pytest.mark.parametrize('units', ['t', 'kt', 'Mt', 'Mt / yr'])
+@pytest.mark.parametrize('units', ['t', 'Mt', 'Mt / yr'])
 @pytest.mark.parametrize('metric, expected_value', EMI_DATA)
 def test_convert_gwp(units, metric, expected_value):
     # Bare masses can be converted
