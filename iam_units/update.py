@@ -6,19 +6,19 @@ import sys
 
 DATA_PATH = Path(__file__).parent / 'data'
 
-# list of contexts
-contexts = ['SARGWP100', 'AR4GWP100', 'AR5GWP100']
-
-# add explicit conversion mappings for derived units (with time & mass)
-formatters = [
-    "[{}]",
-    "[mass] * [{}]",
-    "[mass] * [{}] / [time]",
-    "[{}] / [time]",
-]
-
 
 def emissions():
+    # list of contexts
+    contexts = ['SARGWP100', 'AR4GWP100', 'AR5GWP100']
+
+    # add explicit conversion mappings for derived units (with time & mass)
+    formatters = [
+        "[{}]",
+        "[mass] * [{}]",
+        "[mass] * [{}] / [time]",
+        "[{}] / [time]",
+    ]
+
     # load data from table, drop all rows that don't have defined species
     # the species must match the base unit in `emissions.txt`
     data_path = DATA_PATH / 'emissions'
