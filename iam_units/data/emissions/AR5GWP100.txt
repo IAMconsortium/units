@@ -1,0 +1,81 @@
+# This file was generated using:
+    python -m iam_units.update emissions
+# DO NOT ALTER THIS FILE MANUALLY!
+
+
+@context(_a=NaN) AR5GWP100
+    [mass] -> [_GWP]: value * _a * (_gwp / kg)
+    [_GWP] -> [mass]: value / _a * (kg / _gwp)
+
+    a_C10F18 = 7190.0
+    a_C2F6 = 11100.0
+    a_C3F8 = 8900.0
+    a_C4F10 = 9200.0
+    a_C5F12 = 8550.0
+    a_C6F14 = 7910.0
+    a_CCl4 = 1730.0
+    a_CF4 = 6630.0
+    a_CFC11 = 4660.0
+    a_CFC113 = 5820.0
+    a_CFC114 = 8590.0
+    a_CFC115 = 7670.0
+    a_CFC12 = 10200.0
+    a_CFC13 = 13900.0
+    a_CH2Cl2 = 9.0
+    a_CH3Br = 2.0
+    a_CH3CCl3 = 160.0
+    a_CH3Cl = 12.0
+    a_CH4 = 28.0
+    a_CHCl3 = 16.0
+    a_HCFC123 = 79.0
+    a_HCFC124 = 527.0
+    a_HCFC141b = 782.0
+    a_HCFC142b = 1980.0
+    a_HCFC21 = 148.0
+    a_HCFC22 = 1760.0
+    a_HCFC225ca = 127.0
+    a_HCFC225cb = 525.0
+    a_HFC125 = 3170.0
+    a_HFC134 = 1120.0
+    a_HFC134a = 1300.0
+    a_HFC143 = 328.0
+    a_HFC143a = 4800.0
+    a_HFC152 = 16.0
+    a_HFC152a = 138.0
+    a_HFC161 = 4.0
+    a_HFC227ea = 3350.0
+    a_HFC23 = 12400.0
+    a_HFC236cb = 1210.0
+    a_HFC236ea = 1330.0
+    a_HFC236fa = 8060.0
+    a_HFC245ca = 716.0
+    a_HFC245fa = 858.0
+    a_HFC32 = 677.0
+    a_HFC365mfc = 804.0
+    a_HFC41 = 116.0
+    a_HFC4310mee = 1650.0
+    a_HFE227ea = 6450.0
+    a_HFE236ea2 = 1790.0
+    a_HFE236fa = 979.0
+    a_HFE245fa1 = 828.0
+    a_HFE263fb2 = 1.0
+    a_HFE329mcc2 = 3070.0
+    a_HFE338mcf2 = 929.0
+    a_HFE338pcc13 = 2910.0
+    a_HFE347mcf2 = 854.0
+    a_HFE356mec3 = 387.0
+    a_HFE356pcf2 = 719.0
+    a_HFE356pcf3 = 446.0
+    a_HFE374pc2 = 627.0
+    a_Halon1201 = 376.0
+    a_Halon1211 = 1750.0
+    a_Halon1301 = 6290.0
+    a_Halon2402 = 1470.0
+    a_N2O = 265.0
+    a_NF3 = 16100.0
+    a_PFPMIE = 9710.0
+    a_SF5CF3 = 17400.0
+    a_SF6 = 23500.0
+    a_cC3F6 = 9200.0
+    a_cC4F8 = 9540.0
+@end
