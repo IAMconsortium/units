@@ -118,5 +118,5 @@ See `<DEVELOPING.rst>`_ for further details.
 .. _default_en.txt: https://github.com/hgrecco/pint/blob/master/pint/default_en.txt
 .. _MESSAGEix-GLOBIOM: https://message.iiasa.ac.at
 .. _pyam: https://pyam-iamc.readthedocs.io
-.. _pyam.IamDataFrame.convert_unit(): https://pyam-iamc.readthedocs.io/en/latest/api.html#pyam.IamDataFrame.convert_unit
+.. _pyam.IamDataFrame.convert_unit(): https://pyam-iamc.readthedocs.io/en/stable/api/iamdataframe.html#pyam.IamDataFrame.convert_unit
 .. _pull request: https://github.com/IAMconsortium/units/pulls
