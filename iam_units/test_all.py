@@ -1,6 +1,8 @@
 import csv
 from pathlib import Path
 
+import numpy as np
+from numpy.testing import assert_array_almost_equal
 import pint
 from pint.util import UnitsContainer
 import pytest
@@ -120,3 +122,12 @@ def test_convert_gwp(units, metric, expected_value):
     qty = f'1.0 ' + units.format('CH4')
     expected = registry(f'{expected_value} {units}')
     assert convert_gwp(metric, qty, 'CO2') == expected
+
+    # Tuple of (vector magnitude, unit expression) can be converted where the
+    # the unit expression contains the input species name
+    arr = [1.0, 2.5, 0.1]
+    qty = (arr, units.format('CH4'))
+    assert_array_almost_equal(
+        convert_gwp(metric, qty, 'CO2').magnitude,
+        np.array(arr) * expected_value,
+    )
