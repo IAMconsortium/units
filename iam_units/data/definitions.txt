@@ -8,6 +8,11 @@
 
 tonne_of_coal_equivalent = 29.308 GJ = tce
 
+# Fix for pint interpreting `kt` as knot [velocity] rather than kilo-ton
+# (see https://github.com/IAMconsortium/units/issues/13
+
+kt = 1e6 * kilogram
+
 # Watt-annum
 Wa = watt * year
 
@@ -54,7 +59,6 @@ tkm = tonne_freight * kilometer
 @alias vkm = vkt = v km
 @alias pkm = pkt = p km
 @alias tkm = tkt = t km
-
 
 # Emissions of various greenhouse gases
 
