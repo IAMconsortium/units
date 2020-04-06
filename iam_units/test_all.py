@@ -5,7 +5,7 @@ import pint
 from pint.util import UnitsContainer
 import pytest
 
-from iam_units import registry
+from iam_units import convert_gwp, registry
 
 
 DATA_PATH = Path(__file__).parent / 'data'
@@ -86,3 +86,23 @@ def test_units_emissions(context, value):
         # assert that conversion to CO2-equivalent works
         assert registry[f.format('ch4')].to(f.format('co2e'),
                                             context).magnitude == value
+
+
+def test_emissions_internal():
+    # Dummy units can be created
+    registry('0.5 _gwp').dimensionality == {'[_GWP]': 1.0}
+
+    # Context can be enabled
+    with registry.context('AR5GWP100', __a=1.0) as r:
+        # Context-specific values are activated
+        assert r('a_CH4 * a_N2O').to_base_units().magnitude == 28 * 265
+
+        # Context-specific conversion rules are available
+        r('0.5 t').to('_gwp')
+
+
+def test_convert_gwp():
+    # Bare masses can be converted
+    qty = registry('1.0 tonne')
+    expected = registry('28.0 t')
+    assert convert_gwp('AR5GWP100', qty, 'CH4', 'CO2') == expected
