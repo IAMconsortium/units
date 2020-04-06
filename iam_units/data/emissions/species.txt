@@ -1,5 +1,5 @@
 # This file was generated using:
-    python -m iam_units.update emissions
+#    python -m iam_units.update emissions
 # DO NOT ALTER THIS FILE MANUALLY!
 
 a_C10F18 = NaN
