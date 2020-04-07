@@ -15,10 +15,13 @@ and may be used for research in integrated assessment, energy systems, transport
 Usage
 =====
 
+``iam_units.registry`` is a ``pint.UnitRegistry`` object with the definitions from definitions.txt loaded:
+
 .. code-block:: python
 
     >>> from iam_units import registry
 
+    # Parse an energy unit defined by iam-units
     >>> qty = registry('1.2 tce')
     >>> qty
     1.2 <Unit('tonne_of_coal_equivalent')>
@@ -26,7 +29,7 @@ Usage
     >>> qty.to('GJ')
     29.308 <Unit('gigajoule')>
 
-To make the ``registry`` from this package the default:
+To make the registry from this package the default:
 
 .. code-block:: python
 
@@ -81,7 +84,7 @@ To use one of these contexts, give its name as the second argument to the ``pint
 
 .. code-block:: python
 
-   >>> qty = registry('3.5e3 t N20')
+   >>> qty = registry('3.5e3 t N2O')
    >>> qty
    3500 <Unit('metric_ton * nitrous_oxide')>
 
@@ -92,6 +95,72 @@ To use one of these contexts, give its name as the second argument to the ``pint
    >>> qty.to('Mt CO2', 'gwp_SARGWP100')
    1.085 <Unit('carbon_dioxide * megametric_ton')>
 
+Emissions and GWP (new text for #16)
+------------------------------------
+
+The function ``convert_gwp()`` converts from from mass (or mass-related units) of one specific greenhouse gas (GHG) species to an equivalent quantity of second species, based on `global warming potential`_ (GWP) *metrics*.
+The supported species are listed in `species.txt`_.
+The metrics have names like ``<IPCC report>GWP<years>``, where ``<years>`` is `100` and:
+
+.. list-table::
+   :header-rows: 1
+
+   - - ``<IPCC report>``
+     - Meaning
+   - - ``SAR``
+     - Second Assessment Report (1995)
+   - - ``AR4``
+     - Fourth Assessment Report (2007)
+   - - ``AR5``
+     - Fifth Assessment Report (2014)
+
+.. code-block:: python
+
+   >>> qty = registry('3.5e3 t').to('Mt')
+   >>> qty
+   3.5 <Unit('megametric_ton')>
+
+   # Convert from mass of N2O to GWP-equivalent mass of CO2
+   >>> convert_gwp('AR4GWP100', qty, 'N2O', 'CO2')
+   0.9275 <Unit('megametric_ton')>
+
+   # Using a different metric
+   >>> convert_gwp('AR5GWP100', qty, 'N2O', 'CO2')
+   1.085 <Unit('megametric_ton')>
+
+The function also accepts input with the commonly-used combination of mass (or related) *units* **and** the identity of a particular GHG species:
+
+.. code-block:: python
+
+   # Expression combining magnitude, units, *and* GHG species
+   >>> qty = '3.5 Mt N2O / year'
+
+   # Input species is determined from *qty*
+   >>> convert_gwp('AR5GWP100', qty, 'CO2')
+   1.085 <Unit('megametric_ton / year')>
+
+Strictly, the original species is not a unit but a *nominal property*; see the `International Vocabulary of Metrology`_ (VIM) used in the SI.
+To avoid ambiguity, code handling GHG quantities should also track and output these nominal properties, including:
+
+1. Original species.
+2. Species in which GWP-equivalents are expressed (e.g. CO₂ or C)
+3. GWP metric used to convert (1) to (2).
+
+To aid with this, the function ``format_mass()`` is provided to re-assemble strings that include the GHG species or other information:
+
+.. code-block:: python
+
+   # Perform a conversion
+   >>> qty = convert_gwp('AR5GWP100', '3.5 Mt N2O / year', 'CO2e')
+   >>> qty
+   927.5 <Unit('megametric_ton / year')>
+
+   # Format a string with species and metric info after the mass units of *qty*
+   >>> format_mass(qty, 'CO₂-e (AR5)', spec=':~')
+   'Mt CO₂-e (AR5) / a'
+
+See `Pint's formatting documentation`_ for values of the *spec* argument.
+
 Data sources
 ~~~~~~~~~~~~
 The GWP unit definitions are generated using the file metric_conversions.csv.
@@ -100,7 +169,10 @@ The version in scmdata was transcribed from `this source`_ (PDF link).
 
 See `<DEVELOPING.rst>`_ for details on updating the definitions.
 
+.. _global warming potential: https://en.wikipedia.org/wiki/Global_warming_potential
+.. _International Vocabulary of Metrology: https://www.bipm.org/utils/common/documents/jcgm/JCGM_200_2008.pdf
 .. _contexts: https://pint.readthedocs.io/en/latest/contexts.html
+.. _Pint's formatting documentation: https://pint.readthedocs.io/en/latest/tutorial.html#string-formatting
 .. _lewisjared/scmdata: https://github.com/lewisjared/scmdata/tree/v0.4.0/src/scmdata/data
 .. _this source: https://www.ghgprotocol.org/sites/default/files/ghgp/Global-Warming-Potential-Values%20%28Feb%2016%202016%29_1.pdf
 
@@ -116,6 +188,7 @@ See `<DEVELOPING.rst>`_ for further details.
 .. _GNU GPL version 3: ./LICENSE
 .. _definitions.txt: ./iam_units/data/definitions.txt
 .. _emissions.txt: ./iam_units/data/emissions/emissions.txt
+.. _species.txt: ./iam_units/data/emissions/species.txt
 .. _checks.csv: ./iam_units/data/checks.csv
 .. _Pint: https://pint.readthedocs.io
 .. _default_en.txt: https://github.com/hgrecco/pint/blob/master/pint/default_en.txt

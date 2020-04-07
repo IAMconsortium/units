@@ -32,7 +32,8 @@ sulfur = [sulfur] = S
 @import gwp_SARGWP100.txt
 
 
-# Dummy base unit used for GWP conversions of [mass] -> [mass]
+# Dummy base unit used for GWP conversions of [mass] -> [mass]. This unit has
+# no physical meaning.
 _gwp = [_GWP]
 
 # The reference species, CO2, has a conversion factor of 1
