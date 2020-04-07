@@ -17,6 +17,8 @@ _EMI_HEADER = """# This file was generated using:
 # DO NOT ALTER THIS FILE MANUALLY!
 """
 
+# Format string for individual metrics. To expand the set of supported
+# conversions, duplicate and modify the first pair of lines in the context.
 _EMI_DATA = f"""{_EMI_HEADER}
 @context(_a=NaN) {{metric}}
     [mass] -> [_GWP]: value * (_a * _gwp / kg)
@@ -28,6 +30,11 @@ _EMI_DATA = f"""{_EMI_HEADER}
 @end
 """
 
+# Format string for an importable python module defining the *pattern* regex,
+# which resembles: (?<=[ -])(CO2|C|N2O|CH4)(?=[ -/]|[^\w]|$)
+# - Preceded by a space or '-' character.
+# - Followed by a space, '-', '/', end-of-string, or non-word (\w) character.
+#   The latter avoids matching only the 'C' within 'CH4'.
 _EMI_CODE = fr"""{_EMI_HEADER}
 import re
 
@@ -63,7 +70,7 @@ def emissions():
         f.write(_EMI_HEADER + '\n')
         [f.write(f'a_{symbol} = NaN\n') for symbol in symbols]
 
-    # Write a regular expression containing the species names
+    # Write a Python module with a regex matching the species names
     symbols = ['CO2', 'CO2e', 'C', 'Ce'] + symbols
     symbols = "',\n    '".join(symbols)
     (BASE_PATH / 'emissions.py').write_text(_EMI_CODE.format(**locals()))

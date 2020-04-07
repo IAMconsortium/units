@@ -34,10 +34,18 @@ sulfur = [sulfur] = S
 
 # Dummy base unit used for GWP conversions of [mass] -> [mass]
 _gwp = [_GWP]
+
+# The reference species, CO2, has a conversion factor of 1
 a_CO2 = 1.0 = a_CO2e
+
+# Conversion to/from carbon equivalent is the same regardless of metric
 a_C = 44. / 12 = a_Ce
 
+# Define conversion factors for each species with NaN values. pint requires
+# that this is done outside of setting specific values for a context.
 @import species.txt
+
+# Define contexts for each set of metrics
 @import AR5GWP100.txt
 @import AR4GWP100.txt
 @import SARGWP100.txt
