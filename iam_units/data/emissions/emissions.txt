@@ -34,7 +34,7 @@ sulfur = [sulfur] = S
 
 # Dummy base unit used for GWP conversions of [mass] -> [mass]
 _gwp = [_GWP]
-a_CO2 = 1.0
+a_CO2 = 1.0 = a_CO2e
 
 @import species.txt
 @import AR5GWP100.txt

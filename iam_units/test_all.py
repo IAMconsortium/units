@@ -110,24 +110,26 @@ def test_emissions_internal():
 
 @pytest.mark.parametrize('units', ['t {}', 'Mt {}', 'Mt {} / yr'])
 @pytest.mark.parametrize('metric, expected_value', EMI_DATA)
-def test_convert_gwp(units, metric, expected_value):
+@pytest.mark.parametrize('species_out', ['CO2', 'CO2e'])
+def test_convert_gwp(units, metric, expected_value, species_out):
     # Bare masses can be converted
-
     qty = registry.Quantity(1.0, units.format(''))
     expected = registry(f'{expected_value} {units}')
-    assert convert_gwp(metric, qty, 'CH4', 'CO2') == expected
+    assert convert_gwp(metric, qty, 'CH4', species_out) == expected
 
     # '[mass] [speciesname] (/ [time])' can be converted; the input species is
     # extracted from the *qty* argument
     qty = f'1.0 ' + units.format('CH4')
     expected = registry(f'{expected_value} {units}')
-    assert convert_gwp(metric, qty, 'CO2') == expected
+    assert convert_gwp(metric, qty, species_out) == expected
 
     # Tuple of (vector magnitude, unit expression) can be converted where the
     # the unit expression contains the input species name
     arr = [1.0, 2.5, 0.1]
     qty = (arr, units.format('CH4'))
-    assert_array_almost_equal(
-        convert_gwp(metric, qty, 'CO2').magnitude,
-        np.array(arr) * expected_value,
-    )
+    expected = np.array(arr) * expected_value
+
+    # Conversion works
+    result = convert_gwp(metric, qty, species_out)
+    # Magnitudes are as expected
+    assert_array_almost_equal(result.magnitude, expected)
