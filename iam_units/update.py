@@ -31,10 +31,12 @@ _EMI_DATA = f"""{_EMI_HEADER}
 _EMI_CODE = f"""{_EMI_HEADER}
 import re
 
+# All recognised emission species usable with convert_gwp(). See *pattern*.
 SPECIES = [
     '{{symbols}}',
     ]
 
+# Regular expression for one *SPECIES* in a pint-compatible unit string.
 pattern = re.compile('(?<=[ -])(' + '|'.join(SPECIES) + ')(?=[ -/]?)')
 """
 
