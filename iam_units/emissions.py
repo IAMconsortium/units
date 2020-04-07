@@ -6,6 +6,10 @@ import re
 
 # All recognised emission species usable with convert_gwp(). See *pattern*.
 SPECIES = [
+    'CO2',
+    'CO2e',
+    'C',
+    'Ce',
     'C10F18',
     'C2F6',
     'C3F8',
@@ -93,4 +97,7 @@ SPECIES = [
     ]
 
 # Regular expression for one *SPECIES* in a pint-compatible unit string.
-pattern = re.compile('(?<=[ -])(' + '|'.join(SPECIES) + ')(?=[ -/]?)')
+pattern = re.compile(
+    '(?<=[ -])('
+    + '|'.join(SPECIES)
+    + r')(?=[ -/]|[^\w]|$)')

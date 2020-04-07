@@ -2,7 +2,7 @@ import csv
 from pathlib import Path
 
 import numpy as np
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_almost_equal, assert_array_almost_equal
 import pint
 from pint.util import UnitsContainer
 import pytest
@@ -133,3 +133,16 @@ def test_convert_gwp(units, metric, expected_value, species_out):
     result = convert_gwp(metric, qty, species_out)
     # Magnitudes are as expected
     assert_array_almost_equal(result.magnitude, expected)
+
+
+def test_convert_gwp_carbon():
+    # CO2 can be converted to C
+    qty = (44. / 12, 'tonne CO2')
+    result = convert_gwp('AR5GWP100', qty, 'C')
+    assert result.units == registry('tonne')
+    assert_almost_equal(result.magnitude, 1.0)
+
+    # C can be converted to CO2
+    qty = (1, 'tonne C')
+    expected = registry.Quantity(44. / 12, 'tonne')
+    assert convert_gwp('AR5GWP100', qty, 'CO2e') == expected
