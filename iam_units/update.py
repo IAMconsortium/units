@@ -28,7 +28,7 @@ _EMI_DATA = f"""{_EMI_HEADER}
 @end
 """
 
-_EMI_CODE = f"""{_EMI_HEADER}
+_EMI_CODE = fr"""{_EMI_HEADER}
 import re
 
 # All recognised emission species usable with convert_gwp(). See *pattern*.
@@ -37,7 +37,10 @@ SPECIES = [
     ]
 
 # Regular expression for one *SPECIES* in a pint-compatible unit string.
-pattern = re.compile('(?<=[ -])(' + '|'.join(SPECIES) + ')(?=[ -/]?)')
+pattern = re.compile(
+    '(?<=[ -])('
+    + '|'.join(SPECIES)
+    + r')(?=[ -/]|[^\w]|$)')
 """
 
 
@@ -61,6 +64,7 @@ def emissions():
         [f.write(f'a_{symbol} = NaN\n') for symbol in symbols]
 
     # Write a regular expression containing the species names
+    symbols = ['CO2', 'CO2e', 'C', 'Ce'] + symbols
     symbols = "',\n    '".join(symbols)
     (BASE_PATH / 'emissions.py').write_text(_EMI_CODE.format(**locals()))
 
