@@ -12,6 +12,17 @@ tonne_of_coal_equivalent = 29.308 GJ = tce
 Wa = watt * year
 
 
+# Orders of magnitude (short scale) to be used as prefix for other units
+# https://en.wikipedia.org/wiki/Order_of_magnitude
+
+hundred = 1e2
+thousand = 1e3
+million = 1e6
+billion = 1e9
+trillion = 1e12
+quadrillion = 1e15
+
+
 # Currency
 
 # Based on Germany's GDP deflator, data from

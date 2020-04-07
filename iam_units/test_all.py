@@ -50,6 +50,11 @@ def test_units(unit_str, dim, new_def):
     assert registry('1 ' + unit_str).dimensionality == dim
 
 
+def test_orders_of_magnitude():
+    # The registry recognizes units prefixed by an order of magnitude
+    assert registry('1.2 billion EUR').to('million EUR').magnitude == 1.2e3
+
+
 @pytest.mark.parametrize('context, value',
                          [('AR5GWP100', 28),
                           ('AR4GWP100', 25),
