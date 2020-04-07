@@ -1,6 +1,8 @@
 from pathlib import Path
 
 import pint
+from pint.formatting import format_unit
+from pint.util import to_units_container
 
 from . import emissions
 
@@ -75,3 +77,38 @@ def convert_gwp(metric, quantity, *species):
     # the input units using 'a' for the output species.
     return quantity.to(dummy, metric, _a=f'a_{species_in}') \
                    .to(quantity.units, metric, _a=f'a_{species_out}')
+
+
+def format_mass(obj, info, spec=None):
+    """Format the units of *obj* with *info* inserted after its mass unit.
+
+    Parameters
+    ----------
+    obj : pint.Quantity or pint.Unit
+    info : str
+        Any information, e.g. the symbol of a GHG species.
+    spec : str, optional
+        Pint formatting specifier such as ':H' (HTML format), ':~' (compact
+        format with symbols), etc.
+    """
+    spec = spec or obj.default_format
+
+    try:
+        # Use only the units of a Quantity object
+        obj = obj.units
+    except AttributeError:
+        pass  # Already a Unit object
+
+    # Use the symbol for a ':~' spec
+    method = registry._get_symbol if '~' in spec else lambda k: k
+    # Collect the pieces of the unit expression
+    units = [[method(key), value] for key, value in obj._units.items()]
+
+    # Index of the mass component
+    mass_index = list(obj.dimensionality.keys()).index('[mass]')
+    # Append the information to the mass component
+    units[mass_index][0] += f' {info}'
+
+    # Hand off to pint's formatting
+    return format_unit(to_units_container(dict(units), registry=registry),
+                       spec)

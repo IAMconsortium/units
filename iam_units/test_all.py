@@ -7,7 +7,7 @@ import pint
 from pint.util import UnitsContainer
 import pytest
 
-from iam_units import convert_gwp, registry
+from iam_units import convert_gwp, format_mass, registry
 
 
 DATA_PATH = Path(__file__).parent / 'data'
@@ -146,3 +146,24 @@ def test_convert_gwp_carbon():
     qty = (1, 'tonne C')
     expected = registry.Quantity(44. / 12, 'tonne')
     assert convert_gwp('AR5GWP100', qty, 'CO2e') == expected
+
+
+@pytest.mark.parametrize('units_in, species_str, spec, output', [
+    ('Mt', 'CO2', None, 'megametric_ton CO2'),
+    ('kg / year', 'CO2', None, 'kilogram CO2 / year'),
+    # Compact spec: no spaces around '/'
+    ('kg / year', 'CO2', ':C', 'kilogram CO2/year'),
+    # Abbreviated/symbol spec AND Unicode subscript
+    ('Mt', 'CO₂', ':~', 'Mt CO₂'),
+    ('kg / year', 'CO₂', ':~', 'kg CO₂ / a'),
+    # Abitrary string, e.g. including a hint at the metric name
+    ('gram / a', 'CO₂-e (AR4)', ':~', 'g CO₂-e (AR4) / a'),
+])
+def test_format_mass(units_in, species_str, spec, output):
+    # Quantity object can be formatted
+    qty = registry.Quantity(3.5, units_in)
+    assert format_mass(qty, species_str, spec) == output
+
+    # Unit object can be formatted
+    qty = registry.Unit(units_in)
+    assert format_mass(qty, species_str, spec) == output
