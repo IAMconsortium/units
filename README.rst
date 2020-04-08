@@ -64,40 +64,6 @@ Technical details
 Emissions and GWP
 -----------------
 
-`emissions.txt`_ defines some greenhouse gases (GHGs) as Pint base units.
-Conversion of masses of these GHGs to CO₂ equivalents use selectable global warming potential (GWP) metrics, implemented as Pint `contexts`_ in the other files in the same directory.
-The contexts have names like ``gwp_<IPCC report>GWP<years>``, where ``<years>`` is `100` and:
-
-.. list-table::
-   :header-rows: 1
-
-   - - ``<IPCC report>``
-     - Meaning
-   - - ``SAR``
-     - Second Assessment Report (1995)
-   - - ``AR4``
-     - Fourth Assessment Report (2007)
-   - - ``AR5``
-     - Fifth Assessment Report (2014)
-
-To use one of these contexts, give its name as the second argument to the ``pint.Quantity.to()`` method:
-
-.. code-block:: python
-
-   >>> qty = registry('3.5e3 t N2O')
-   >>> qty
-   3500 <Unit('metric_ton * nitrous_oxide')>
-
-   >>> qty.to('Mt CO2', 'gwp_AR4GWP100')
-   0.9275 <Unit('carbon_dioxide * megametric_ton')>
-
-   # Using a different metric
-   >>> qty.to('Mt CO2', 'gwp_SARGWP100')
-   1.085 <Unit('carbon_dioxide * megametric_ton')>
-
-Emissions and GWP (new text for #16)
-------------------------------------
-
 The function ``convert_gwp()`` converts from from mass (or mass-related units) of one specific greenhouse gas (GHG) species to an equivalent quantity of second species, based on `global warming potential`_ (GWP) *metrics*.
 The supported species are listed in `species.txt`_.
 The metrics have names like ``<IPCC report>GWP<years>``, where ``<years>`` is `100` and:

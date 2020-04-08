@@ -74,6 +74,7 @@ EMI_DATA = [
 ]
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize('context, value', EMI_DATA)
 def test_units_emissions(context, value):
     # The registry shouldn't convert with specifying a valid context
