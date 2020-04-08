@@ -67,7 +67,8 @@ def convert_gwp(metric, quantity, *species):
     # - If tuple input was given, use the 2-arg constructor.
     # - If not, use the 1-arg form to convert a string.
     # - If the input was already a Quantity, this is a no-op.
-    quantity = registry.Quantity(mag, expr) if mag else registry.Quantity(expr)
+    args = (expr,) if mag is None else (mag, expr)
+    quantity = registry.Quantity(*args)
 
     # Intermediate units with the same dimensionality as *quantity*, except
     # '[mass]' replaced with the dummy unit '_gwp'
