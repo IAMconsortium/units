@@ -1,6 +1,3 @@
-import csv
-from pathlib import Path
-
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 import pint
@@ -10,31 +7,21 @@ import pytest
 from iam_units import convert_gwp, format_mass, registry
 
 
-DATA_PATH = Path(__file__).parent / 'data'
-defaults = pint.get_application_registry()
+DEFAULTS = pint.get_application_registry()
 
-
-# Read units to check from file
-PARAMS = []
-with open(DATA_PATH / 'checks.csv') as f:
-    for row in csv.reader(f, skipinitialspace=True, quoting=csv.QUOTE_MINIMAL):
-        try:
-            unit_str, dims, new_def = row
-        except ValueError:
-            continue  # Comment or malformed row; skip
-        else:
-            if unit_str.startswith('#'):
-                continue  # Comment; skip
-
-        # Convert second column to a dimensionality object
-        dims = {dims: 1} if dims.startswith('[') else eval(dims)
-        dims = UnitsContainer(dims)
-
-        # Convert third column to boolean
-        new_def = len(new_def) > 0
-
-        # Store
-        PARAMS.append((unit_str, dims, new_def))
+# Parameters for test_units(), tuple of:
+# 1. A literal string to be parsed as a unit.
+# 2. Expected dimensionality of the parsed unit.
+# 3. True if the units are not in pint's default_en.txt, but are defined in
+#    definitions.txt.
+energy = UnitsContainer({'[energy]': 1})
+PARAMS = [
+    ('toe', energy, False),
+    ('tce', energy, True),
+    ('GW a', energy, False),
+    ('kWa', energy, True),
+    ('EUR_2005', UnitsContainer({'[currency]': 1}), True),
+]
 
 
 @pytest.mark.parametrize('unit_str, dim, new_def', PARAMS,
@@ -43,7 +30,7 @@ def test_units(unit_str, dim, new_def):
     if new_def:
         # Units defined in dimensions.txt are not recognized by base pint
         with pytest.raises(pint.UndefinedUnitError):
-            defaults('1 ' + unit_str)
+            DEFAULTS('1 ' + unit_str)
 
     # Physical quantity of units is recognized
     dim = registry.get_dimensionality(dim)
@@ -74,28 +61,6 @@ EMI_DATA = [
 ]
 
 
-@pytest.mark.skip
-@pytest.mark.parametrize('context, value', EMI_DATA)
-def test_units_emissions(context, value):
-    # The registry shouldn't convert with specifying a valid context
-    with pytest.raises(pint.DimensionalityError):
-        registry['ch4'].to('co2')
-
-    context = f'gwp_{context}'
-
-    # test commonly used derived units related to emissions
-    formats = ['{}', 'Mt {}', 'Mt {} / yr', '{} / yr']
-
-    for f in formats:
-        # assert that conversion to CO2 works
-        assert registry[f.format('ch4')].to(f.format('co2'),
-                                            context).magnitude == value
-
-        # assert that conversion to CO2-equivalent works
-        assert registry[f.format('ch4')].to(f.format('co2e'),
-                                            context).magnitude == value
-
-
 def test_emissions_internal():
     # Dummy units can be created
     registry('0.5 _gwp').dimensionality == {'[_GWP]': 1.0}
@@ -109,7 +74,7 @@ def test_emissions_internal():
         r('0.5 t').to('_gwp')
 
 
-@pytest.mark.parametrize('units', ['t {}', 'Mt {}', 'Mt {} / yr'])
+@pytest.mark.parametrize('units', ['t {}', 'Mt {}', 'kt {} / yr'])
 @pytest.mark.parametrize('metric, expected_value', EMI_DATA)
 @pytest.mark.parametrize('species_out', ['CO2', 'CO2e'])
 def test_convert_gwp(units, metric, expected_value, species_out):
@@ -126,9 +91,9 @@ def test_convert_gwp(units, metric, expected_value, species_out):
 
     # Tuple of (vector magnitude, unit expression) can be converted where the
     # the unit expression contains the input species name
-    arr = [1.0, 2.5, 0.1]
+    arr = np.array([1.0, 2.5, 0.1])
     qty = (arr, units.format('CH4'))
-    expected = np.array(arr) * expected_value
+    expected = arr * expected_value
 
     # Conversion works
     result = convert_gwp(metric, qty, species_out)
