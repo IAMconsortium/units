@@ -8,8 +8,8 @@ from . import emissions
 
 
 __all__ = [
-    'SPECIES',
     'convert_gwp',
+    'format_mass',
     'registry',
 ]
 
