@@ -19,18 +19,25 @@ _EMI_HEADER = """# This file was generated using:
 
 # Format string for individual metrics. To expand the set of supported
 # conversions, duplicate and modify the first pair of lines in the context.
+# Only the portion before of the ':' needs to be modified. Currently supported:
+# 1. Mass
+# 2. Mass rate, i.e. mass per time.
+# 3. Flux, i.e. mass per area per time.
 _EMI_DATA = f"""{_EMI_HEADER}
 @context(_a=NaN) {{metric}}
     [mass] -> [_GWP]: value * (_a * _gwp / kg)
     [_GWP] -> [mass]: value / (_a * _gwp / kg)
     [mass] / [time] -> [_GWP] / [time]: value * (_a * _gwp / kg)
     [_GWP] / [time] -> [mass] / [time]: value / (_a * _gwp / kg)
+    [mass] / [time] / [area] -> [_GWP] / [time] / [area]: value * (_a * _gwp / kg)
+    [_GWP] / [time] / [area] -> [mass] / [time] / [area]: value / (_a * _gwp / kg)
+
 
     {{defs}}
 @end
-"""
+"""  # noqa: E501
 
-# Format string for an importable python module defining the *pattern* regex,
+# Format string for an importable Python module defining the *pattern* regex,
 # which resembles: (?<=[ -])(CO2|C|N2O|CH4)(?=[ -/]|[^\w]|$)
 # - Preceded by a space or '-' character.
 # - Followed by a space, '-', '/', end-of-string, or non-word (\w) character.

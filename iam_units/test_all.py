@@ -74,7 +74,11 @@ def test_emissions_internal():
         r('0.5 t').to('_gwp')
 
 
-@pytest.mark.parametrize('units', ['t {}', 'Mt {}', 'kt {} / yr'])
+@pytest.mark.parametrize('units', [
+    't {}',               # Mass
+    'Mt {} / a',          # Mass rate
+    'kt {} / (ha * yr)',  # Mass flux
+])
 @pytest.mark.parametrize('metric, expected_value', EMI_DATA)
 @pytest.mark.parametrize('species_out', ['CO2', 'CO2e'])
 def test_convert_gwp(units, metric, expected_value, species_out):
