@@ -61,7 +61,4 @@ tkm = tonne_freight * kilometer
 @alias tkm = tkt = t km
 
 # Emissions of various greenhouse gases
-
-# please add any emissions-related definitions to modules/emissions
-
 @import emissions/emissions.txt
