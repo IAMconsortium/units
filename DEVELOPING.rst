@@ -51,4 +51,4 @@ Update these files using the command::
     $ python -m iam_units.update emissions
 
 The update submodule parses metric_conversions.csv and writes the context files.
-When adding a new context file, make sure to ``@import`` it in emissions.txt and update the tests.
+When adding a new context file, make sure to ``@import`` it in emissions.txt and expand the tests.

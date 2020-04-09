@@ -10,7 +10,12 @@ These definitions are used by:
 - the Python package `pyam`_ for analysis and visualization of integrated-assessment scenarios (see `pyam.IamDataFrame.convert_unit()`_ for details)
 
 and may be used for research in integrated assessment, energy systems, transportation, or other, related fields.
-(Please open a `pull request`_ to add your usage to this README!)
+
+Please open a GitHub `issue`_ or `pull request`_ to:
+
+- Add more units to definitions.txt.
+- Add your usage of iam-units to this README.
+- Request or contribute additional features.
 
 Usage
 =====
@@ -62,7 +67,7 @@ Emissions and GWP
 -----------------
 
 The function ``convert_gwp()`` converts from from mass (or mass-related units) of one specific greenhouse gas (GHG) species to an equivalent quantity of second species, based on `global warming potential`_ (GWP) *metrics*.
-The supported species are listed in `species.txt`_.
+The supported species are listed in `species.txt`_ and the variable ``iam_units.emissions.SPECIES``.
 The metrics have names like ``<IPCC report>GWP<years>``, where ``<years>`` is `100` and:
 
 .. list-table::
@@ -143,8 +148,7 @@ See `<DEVELOPING.rst>`_ for details on updating the definitions.
 Tests and development
 =====================
 
-Use ``pytest iam_units`` to check that the definitions can be loaded.
-Example unit expressions in `checks.csv`_ are also checked.
+Use ``pytest iam_units --verbose`` to run the test suite included in the submodule ``iam_units.test_all``.
 See `<DEVELOPING.rst>`_ for further details.
 
 .. _IAM-units authors: ./AUTHORS
@@ -158,4 +162,5 @@ See `<DEVELOPING.rst>`_ for further details.
 .. _MESSAGEix-GLOBIOM: https://message.iiasa.ac.at
 .. _pyam: https://pyam-iamc.readthedocs.io
 .. _pyam.IamDataFrame.convert_unit(): https://pyam-iamc.readthedocs.io/en/stable/api/iamdataframe.html#pyam.IamDataFrame.convert_unit
+.. _issue: https://github.com/IAMconsortium/units/issues
 .. _pull request: https://github.com/IAMconsortium/units/pulls
