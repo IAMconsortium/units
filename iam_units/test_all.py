@@ -55,6 +55,15 @@ def test_orders_of_magnitude():
     assert registry('1.2 billion EUR').to('million EUR').magnitude == 1.2e3
 
 
+def test_kt():
+    # The registry should correctly interpret `kt` as a weight (not velocity)
+    assert str(registry('1000 kt').to('Mt')) == '1.0 megametric_ton'
+
+    # A default UnitRegistry should interpret `kt` as velocity
+    with pytest.raises(pint.DimensionalityError):
+        pint.UnitRegistry()('kt').to('Mt')
+
+
 @pytest.mark.parametrize('context, value',
                          [('AR5GWP100', 28),
                           ('AR4GWP100', 25),

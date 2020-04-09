@@ -51,6 +51,9 @@ Warnings
    - - 'C' = Coulomb
      - 'C' = carbon
      - See `emissions.txt`_ at line 10.
+   - - 'kt' = knot [velocity]
+     - 'kt' = 1000 metric tons
+     - 'kt' is commonly used for emissions in the IAM-context.
 
 Technical details
 =================
