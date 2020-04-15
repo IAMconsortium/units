@@ -63,6 +63,18 @@ def convert_gwp(metric, quantity, *species):
         # Re-assemble the expression for the units or whole quantity
         expr = q0 + q1
 
+    # metric may be 'None' iff the input and output species are the same
+    if metric is None:
+        if species_in == species_out:
+            metric = 'AR5GWP100'
+        elif species_in in species_out:
+            # Both a DimensionalityError ('CO2' → 'CO2 / a') and a ValueError
+            # (no metric); raise the former for pyam compat
+            raise pint.DimensionalityError(species_in, species_out)
+        else:
+            msg = f'Must provide GWP metric for ({species_in}, {species_out})'
+            raise ValueError(msg)
+
     # Ensure a pint.Quantity object:
     # - If tuple input was given, use the 2-arg constructor.
     # - If not, use the 1-arg form to convert a string.
