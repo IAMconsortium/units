@@ -53,14 +53,6 @@ def test_kt():
         pint.UnitRegistry()('kt').to('Mt')
 
 
-# 1 tonne of CH4 converted to CO2 equivalent by different metrics
-EMI_DATA = [
-    ('AR5GWP100', 28),
-    ('AR4GWP100', 25),
-    ('SARGWP100', 21)
-]
-
-
 def test_emissions_internal():
     # Dummy units can be created
     registry('0.5 _gwp').dimensionality == {'[_GWP]': 1.0}
@@ -79,24 +71,29 @@ def test_emissions_internal():
     'Mt {} / a',          # Mass rate
     'kt {} / (ha * yr)',  # Mass flux
 ])
-@pytest.mark.parametrize('metric, expected_value', EMI_DATA)
-@pytest.mark.parametrize('species_out', ['CO2', 'CO2e'])
-def test_convert_gwp(units, metric, expected_value, species_out):
+@pytest.mark.parametrize('metric, species_in, species_out, expected_value', [
+    ('AR5GWP100', 'CH4', 'CO2', 28),
+    ('AR5GWP100', 'CH4', 'CO2e', 28),
+    ('AR4GWP100', 'CH4', 'CO2', 25),
+    ('SARGWP100', 'CH4', 'CO2', 21),
+    (None, 'CO2', 'CO2', 1.),
+])
+def test_convert_gwp(units, metric, species_in, species_out, expected_value):
     # Bare masses can be converted
     qty = registry.Quantity(1.0, units.format(''))
     expected = registry(f'{expected_value} {units}')
-    assert convert_gwp(metric, qty, 'CH4', species_out) == expected
+    assert convert_gwp(metric, qty, species_in, species_out) == expected
 
     # '[mass] [speciesname] (/ [time])' can be converted; the input species is
     # extracted from the *qty* argument
-    qty = f'1.0 ' + units.format('CH4')
+    qty = f'1.0 ' + units.format(species_in)
     expected = registry(f'{expected_value} {units}')
     assert convert_gwp(metric, qty, species_out) == expected
 
     # Tuple of (vector magnitude, unit expression) can be converted where the
     # the unit expression contains the input species name
     arr = np.array([1.0, 2.5, 0.1])
-    qty = (arr, units.format('CH4'))
+    qty = (arr, units.format(species_in))
     expected = arr * expected_value
 
     # Conversion works
