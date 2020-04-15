@@ -21,20 +21,21 @@ registry.load_definitions(
 
 
 def convert_gwp(metric, quantity, *species):
-    """Convert *quantity* between emissions *species* with a GWP *metric*.
+    """Convert *quantity* between GHG *species* with a GWP *metric*.
 
     Parameters
     ----------
-    metric : 'SARGWP100' or 'AR4GWP100' or 'AR5GWP100'
-        Metric conversion factors to use.
+    metric : 'SARGWP100' or 'AR4GWP100' or 'AR5GWP100' or None
+        Metric conversion factors to use. May be :obj:`None` if the input and
+        output species are the same.
     quantity : str or pint.Quantity or tuple
         Quantity to convert. If a tuple, the arguments are passed to the
         :class:`pint.Quantity` constructor.
     species : sequence of str, length 1 or 2
-        Output, or input and output emissions species, e.g. ('CH4', 'CO2') to
-        convert mass of CH₄ to GWP-equivalent mass of CO₂. If only the output
-        species is provided, *quantity* must contain the name of the input
-        species in some location, e.g. 'tonne CH4 / year'.
+        Output, or (input, output) species, e.g. ('CH4', 'CO2') to convert
+        mass of CH₄ to GWP-equivalent mass of CO₂. If only the output species
+        is provided, *quantity* must contain the name of the input species in
+        some location, e.g. 'tonne CH4 / year'.
 
     Returns
     -------
