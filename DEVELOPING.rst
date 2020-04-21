@@ -32,8 +32,15 @@ The 'Build' and 'Check' steps are also performed by the GitHub CI for each PR/co
    # Check
    $ twine check dist/*
 
-   # Upload to TestPyPI and check that the package is installable
+   # Upload to TestPyPI
    $ twine upload --repository-url https://test.pypi.org/legacy dist/*
+
+   # Check that the package can be installed and tests run
+   $ mkdir tmp && cd tmp
+   $ pip uninstall iam-units && pip install --index-url https://test.pypi.org/simple/ iam-units
+   $ pytest --pyargs iam_units
+   $ cd ..
+   $ pip uninstall iam-units && pip install --editable .
 
    # Publish
    $ twine upload
