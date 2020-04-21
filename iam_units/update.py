@@ -1,3 +1,4 @@
+from itertools import chain
 from pathlib import Path
 
 import pandas as pd
@@ -50,12 +51,23 @@ SPECIES = [
     '{{symbols}}',
     ]
 
+# Sets of symbols that refer to the same species and are interchangeable.
+EQUIV = [
+    set({{equiv}}),
+    ]
+
 # Regular expression for one *SPECIES* in a pint-compatible unit string.
 pattern = re.compile(
     '(?<=[ -])('
     + '|'.join(SPECIES)
     + r')(?=[ -/]|[^\w]|$)')
 """
+
+# Equivalents: different symbols for the same species.
+_EMI_EQUIV = [
+    ['CO2', 'CO2_eq', 'CO2e', 'CO2eq'],
+    ['C', 'Ce'],
+]
 
 
 def emissions():
@@ -71,32 +83,39 @@ def emissions():
              .melt(id_vars=['Species', 'Symbol'], var_name='metric') \
              .dropna(subset=['value'])
 
-    # Write the file containing the species defs
+    # List of symbols requiring a GWP context to covert
     symbols = sorted(data['Symbol'].unique())
-    with open(data_path / 'species.txt', 'w') as f:
-        f.write(_EMI_HEADER + '\n')
-        [f.write(f'a_{symbol} = NaN\n') for symbol in symbols]
+
+    # Format and write the species defs file
+    lines = [_EMI_HEADER]
+    for group in _EMI_EQUIV:
+        lines.extend(f'a_{s} = a_{group[0]}' for s in group[1:])
+    lines.extend(f'a_{s} = NaN' for s in symbols)
+    lines.append('')
+    (data_path / 'species.txt').write_text('\n'.join(lines))
 
     # Write a Python module with a regex matching the species names
-    symbols = ['CO2', 'CO2e', 'C', 'Ce'] + symbols
-    symbols = "',\n    '".join(symbols)
-    (BASE_PATH / 'emissions.py').write_text(_EMI_CODE.format(**locals()))
+
+    # Prepare list including all symbols
+    all_symbols = list(chain(*_EMI_EQUIV, symbols))
+
+    # Format and write
+    code = _EMI_CODE.format(
+        symbols="',\n    '".join(all_symbols),
+        equiv="),\n    set(".join(map(repr, _EMI_EQUIV)),
+    )
+    (BASE_PATH / 'emissions.py').write_text(code)
 
     # Write one file containing a context for each metric
     for metric, _data in data.groupby('metric'):
         # Conversion factor definitions
-        defs = []
-        for _, row in _data.iterrows():
-            defs.append(f'a_{row.Symbol} = {row.value}')
+        defs = [f'a_{row.Symbol} = {row.value}' for _, row in _data.iterrows()]
 
-        # Join to a single string
-        defs = '\n    '.join(defs)
+        # Format the template with the definitions
+        content = _EMI_DATA.format(metric=metric, defs='\n    '.join(defs))
 
         # Write to file
-        (data_path / f'{metric}.txt').write_text(
-            # Format the template with the definitions
-            _EMI_DATA.format(**locals())
-        )
+        (data_path / f'{metric}.txt').write_text(content)
 
 
 if __name__ == '__main__':
