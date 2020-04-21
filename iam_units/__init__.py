@@ -64,9 +64,11 @@ def convert_gwp(metric, quantity, *species):
         # Re-assemble the expression for the units or whole quantity
         expr = q0 + q1
 
-    # metric may be 'None' iff the input and output species are the same
+    # *metric* can only be None if the input and output species symbols are
+    # identical or equivalent
     if metric is None:
-        if species_in == species_out:
+        if (species_in == species_out or
+                any({species_in, species_out} <= g for g in emissions.EQUIV)):
             metric = 'AR5GWP100'
         elif species_in in species_out:
             # Both a DimensionalityError ('CO2' → 'CO2 / a') and a ValueError
