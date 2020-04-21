@@ -76,7 +76,14 @@ def test_emissions_internal():
     ('AR5GWP100', 'CH4', 'CO2e', 28),
     ('AR4GWP100', 'CH4', 'CO2', 25),
     ('SARGWP100', 'CH4', 'CO2', 21),
-    (None, 'CO2', 'CO2', 1.),
+
+    # Same-species conversion with metric=None and compatible names
+    (None, 'CO2', 'CO2_eq', 1.),
+    (None, 'CO2eq', 'CO2e', 1.),
+
+    # Species names which are substrings of one another match correctly
+    ('AR5GWP100', 'HFC143', 'CO2', 328.0),
+    ('AR5GWP100', 'HFC143a', 'CO2', 4800.0),
 ])
 def test_convert_gwp(units, metric, species_in, species_out, expected_value):
     # Bare masses can be converted
