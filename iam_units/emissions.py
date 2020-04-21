@@ -7,7 +7,9 @@ import re
 # All recognised emission species usable with convert_gwp(). See *pattern*.
 SPECIES = [
     'CO2',
+    'CO2_eq',
     'CO2e',
+    'CO2eq',
     'C',
     'Ce',
     'C10F18',
@@ -94,6 +96,12 @@ SPECIES = [
     'SF6',
     'cC3F6',
     'cC4F8',
+    ]
+
+# Pairs of emission species symbols that are interchangeable.
+EQUIV = [
+    set(['CO2', 'CO2_eq', 'CO2e', 'CO2eq']),
+    set(['C', 'Ce']),
     ]
 
 # Regular expression for one *SPECIES* in a pint-compatible unit string.
