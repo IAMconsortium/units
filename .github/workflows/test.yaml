@@ -21,7 +21,7 @@ jobs:
       run: |
         pip install numpy pytest pytest-cov setuptools-scm
         pip install --editable .
-        pytest --verbose --cov-report=xml
+        pytest -rA --verbose --color=yes --cov=iam_units --cov-report=xml
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v1.2.1
