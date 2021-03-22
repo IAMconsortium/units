@@ -40,5 +40,6 @@ jobs:
 
     - name: Check typing with mypy
       run: |
-        pip install mypy
+        # Also install packages that provide type hints
+        pip install mypy numpy pytest
         mypy .
