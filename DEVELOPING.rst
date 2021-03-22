@@ -18,33 +18,39 @@ Thus:
 Releasing
 =========
 
-The 'Build' and 'Check' steps are also performed by the GitHub CI for each PR/commit.
 
-.. code-block::
+Releasing
+*********
 
-   # Tag the release. Omit leading zeros.
-   $ git tag v2020.4.6
+1. Before releasing, check https://github.com/IAMconsortium/units/actions/workflows/test.yaml to ensure that the push and scheduled builds are passing.
+   Address any failures before releasing.
 
-   # Build
-   $ rm -r build dist
-   $ python3 setup.py bdist_wheel sdist
+2. Tag the release candidate version, i.e. with a ``rcN`` suffix, and push::
 
-   # Check
-   $ twine check dist/*
+    $ git tag v2021.3.22rc1
+    $ git push --tags origin main
 
-   # Upload to TestPyPI
-   $ twine upload --repository-url https://test.pypi.org/legacy dist/*
+3. Check:
 
-   # Check that the package can be installed and tests run
-   $ mkdir tmp && cd tmp
-   $ pip uninstall iam-units && pip install --index-url https://test.pypi.org/simple/ iam-units
-   $ pytest --pyargs iam_units
-   $ cd ..
-   $ pip uninstall iam-units && pip install --editable .
+   - at https://github.com/IAMconsortium/units/actions/workflows/publish.yaml that the workflow completes: the package builds successfully and is published to TestPyPI.
+   - at https://test.pypi.org/project/iam-units/ that:
 
-   # Publish
-   $ twine upload
-   $ git push --tags
+      - The package can be downloaded, installed and run.
+      - The README is rendered correctly.
+
+   Address any warnings or errors that appear.
+   If needed, make a new commit and go back to step (2), incrementing the rc number.
+
+4. (optional) Tag the release itself and push::
+
+    $ git tag v2021.3.22
+    $ git push --tags origin main
+
+   This step (but *not* step (2)) can also be performed directly on GitHub; see (5), next.
+
+5. Visit https://github.com/IAMconsortium/units/releases and mark the new release: either using the pushed tag from (4), or by creating the tag and release simultaneously.
+
+6. Check at https://github.com/IAMconsortium/units/actions/workflows/publish.yaml and https://pypi.org/project/iam-units/ that the distributions are published.
 
 
 Generated data files for GWP contexts
