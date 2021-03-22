@@ -6,18 +6,16 @@ from pint.util import to_units_container
 
 from . import emissions
 
-
 __all__ = [
-    'convert_gwp',
-    'format_mass',
-    'registry',
+    "convert_gwp",
+    "format_mass",
+    "registry",
 ]
 
 
 # Package registry using definitions.txt
 registry = pint.UnitRegistry()
-registry.load_definitions(
-    str(Path(__file__).parent / 'data' / 'definitions.txt'))
+registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
 
 
 def convert_gwp(metric, quantity, *species):
@@ -47,7 +45,7 @@ def convert_gwp(metric, quantity, *species):
         species_in, species_out = species
     except ValueError:
         if len(species) != 1:
-            raise ValueError('Must provide (from, to) or (to,) species')
+            raise ValueError("Must provide (from, to) or (to,) species")
         species_in, species_out = None, species[0]
 
     # Split *quantity* if it is a tuple. After this step:
@@ -66,15 +64,16 @@ def convert_gwp(metric, quantity, *species):
     # *metric* can only be None if the input and output species symbols are
     # identical or equivalent
     if metric is None:
-        if (species_in == species_out or
-                any({species_in, species_out} <= g for g in emissions.EQUIV)):
-            metric = 'AR5GWP100'
+        if species_in == species_out or any(
+            {species_in, species_out} <= g for g in emissions.EQUIV
+        ):
+            metric = "AR5GWP100"
         elif species_in in species_out:
             # Eg. 'CO2' in 'CO2 / a'. This is both a DimensionalityError and a
             # ValueError (no metric); raise the former for pyam compat
             raise pint.DimensionalityError(species_in, species_out)
         else:
-            msg = f'Must provide GWP metric for ({species_in}, {species_out})'
+            msg = f"Must provide GWP metric for ({species_in}, {species_out})"
             raise ValueError(msg)
 
     # Ensure a pint.Quantity object:
@@ -86,12 +85,13 @@ def convert_gwp(metric, quantity, *species):
 
     # Construct intermediate units with the same dimensionality as *quantity*,
     # except '[mass]' replaced with the dummy unit '_gwp'
-    dummy = quantity.units / registry.Unit('tonne / _gwp')
+    dummy = quantity.units / registry.Unit("tonne / _gwp")
 
     # Convert to dummy units using 'a' for the input species; then back to the
     # input units using 'a' for the output species.
-    return quantity.to(dummy, metric, _a=f'a_{species_in}') \
-                   .to(quantity.units, metric, _a=f'a_{species_out}')
+    return quantity.to(dummy, metric, _a=f"a_{species_in}").to(
+        quantity.units, metric, _a=f"a_{species_out}"
+    )
 
 
 def format_mass(obj, info, spec=None):
@@ -115,15 +115,14 @@ def format_mass(obj, info, spec=None):
         pass  # Already a Unit object
 
     # Use the symbol for a ':~' spec
-    method = registry._get_symbol if '~' in spec else lambda k: k
+    method = registry._get_symbol if "~" in spec else lambda k: k
     # Collect the pieces of the unit expression
     units = [[method(key), value] for key, value in obj._units.items()]
 
     # Index of the mass component
-    mass_index = list(obj.dimensionality.keys()).index('[mass]')
+    mass_index = list(obj.dimensionality.keys()).index("[mass]")
     # Append the information to the mass component
-    units[mass_index][0] += f' {info}'
+    units[mass_index][0] += f" {info}"
 
     # Hand off to pint's formatting
-    return format_unit(to_units_container(dict(units), registry=registry),
-                       spec)
+    return format_unit(to_units_container(dict(units), registry=registry), spec)
