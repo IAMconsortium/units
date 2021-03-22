@@ -22,3 +22,6 @@ jobs:
         pip install numpy pytest setuptools-scm
         pip install --editable .
         pytest --verbose
+
+    - name: Upload test coverage to Codecov.io
+      uses: codecov/codecov-action@v1.2.1
