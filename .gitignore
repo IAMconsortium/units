@@ -8,3 +8,4 @@ dist
 
 # Editors
 .idea/*
+*.eggs

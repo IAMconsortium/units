@@ -62,3 +62,6 @@ tkm = tonne_freight * kilometer
 
 # Emissions of various greenhouse gases
 @import emissions/emissions.txt
+
+# Litres of gasoline-equivalent
+Lge = 33.5 * MJ
