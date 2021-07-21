@@ -15,10 +15,11 @@ DEFAULTS = pint.get_application_registry()
 #    definitions.txt.
 energy = UnitsContainer({"[energy]": 1})
 PARAMS = [
-    ("toe", energy, False),
-    ("tce", energy, True),
     ("GW a", energy, False),
     ("kWa", energy, True),
+    ("Lge", energy, True),
+    ("tce", energy, True),
+    ("toe", energy, False),
     ("EUR_2005", UnitsContainer({"[currency]": 1}), True),
 ]
 
