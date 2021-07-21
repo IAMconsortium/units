@@ -167,7 +167,7 @@ See `<DEVELOPING.rst>`_ for further details.
 .. _checks.csv: ./iam_units/data/checks.csv
 .. _Pint: https://pint.readthedocs.io
 .. _default_en.txt: https://github.com/hgrecco/pint/blob/master/pint/default_en.txt
-.. _MESSAGEix-GLOBIOM: https://message.iiasa.ac.at
+.. _MESSAGEix-GLOBIOM: https://docs.messageix.org
 .. _pyam: https://pyam-iamc.readthedocs.io
 .. _pyam.IamDataFrame.convert_unit(): https://pyam-iamc.readthedocs.io/en/stable/api/iamdataframe.html#pyam.IamDataFrame.convert_unit
 .. _issue: https://github.com/IAMconsortium/units/issues
