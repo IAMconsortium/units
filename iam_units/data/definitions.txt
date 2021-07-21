@@ -1,20 +1,28 @@
 # Energy
 
-# Values from
-# https://cngcenter.com/wp-content/uploads/2013/09/UnitsAndConversions.pdf
-
-# Defined in https://github.com/hgrecco/pint/blob/master/pint/default_en.txt:
-# - tonne_of_oil_equivalent
+# Energy content of coal by mass
+# Source: https://cngcenter.com/wp-content/uploads/2013/09/UnitsAndConversions.pdf
+#
+# - tonne_of_oil_equivalent is already defined in pint's default_en.txt
 
 tonne_of_coal_equivalent = 29.308 GJ = tce
 
-# Fix for pint interpreting `kt` as knot [velocity] rather than kilo-ton
-# (see https://github.com/IAMconsortium/units/issues/13
+# Energy content of gasoline by volume
+# Source: https://theicct.org/sites/default/files/publications/GFEI_WP19_Final_V3_Web.pdf
+# page 24, footnote 23.
+
+litre_of_gasoline_equivalent = 33.5 * MJ = Lge = lge
+
+# Short form of Watt-annum
+Wa = watt * year
+
+
+# Mass
+
+# Override pint's default `kt` = knot [velocity] rather than kilo-tonne.
+# See https://github.com/IAMconsortium/units/issues/13
 
 kt = 1e6 * kilogram
-
-# Watt-annum
-Wa = watt * year
 
 
 # Orders of magnitude (short scale) to be used as prefix for other units
@@ -62,7 +70,3 @@ tkm = tonne_freight * kilometer
 
 # Emissions of various greenhouse gases
 @import emissions/emissions.txt
-
-# Litres of gasoline-equivalent. Conversion values from
-# https://theicct.org/sites/default/files/publications/GFEI_WP19_Final_V3_Web.pdf, page 24, footnote 23.
-Lge = 33.5 * MJ
