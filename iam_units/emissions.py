@@ -98,7 +98,7 @@ SPECIES = [
     "cC4F8",
 ]
 
-# Pairs of emission species symbols that are interchangeable.
+# Sets of symbols that refer to the same species and are interchangeable.
 EQUIV = [
     set(["CO2", "CO2_eq", "CO2e", "CO2eq", "C", "Ce"]),
 ]

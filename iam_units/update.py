@@ -63,10 +63,15 @@ pattern = re.compile(
 """
 
 # Equivalents: different symbols for the same species.
-_EMI_EQUIV = [
-    ["CO2", "CO2_eq", "CO2e", "CO2eq"],
-    ["C", "Ce"],
-]
+_EMI_EQUIV = {
+    "CO2": {
+        "CO2_eq": None,
+        "CO2e": None,
+        "CO2eq": None,
+        "C": "44. / 12 * ",
+        "Ce": "44. / 12 * ",
+    }
+}
 
 
 def emissions():
@@ -89,8 +94,10 @@ def emissions():
 
     # Format and write the species defs file
     lines = [_EMI_HEADER]
-    for group in _EMI_EQUIV:
-        lines.extend(f"a_{s} = a_{group[0]}" for s in group[1:])
+    for (species, alias) in _EMI_EQUIV.items():
+        lines.extend(
+            f"a_{a} = {factor or ''}a_{species}" for a, factor in alias.items()
+        )
     lines.extend(f"a_{s} = NaN" for s in symbols)
     lines.append("")
     (data_path / "species.txt").write_text("\n".join(lines))
@@ -98,12 +105,13 @@ def emissions():
     # Write a Python module with a regex matching the species names
 
     # Prepare list including all symbols
-    all_symbols = list(chain(*_EMI_EQUIV, symbols))
+    all_alias_groups = list([key, *value] for key, value in _EMI_EQUIV.items())
+    all_symbols = list(chain(*all_alias_groups, symbols))
 
     # Format and write
     code = _EMI_CODE.format(
         symbols="',\n    '".join(all_symbols),
-        equiv="),\n    set(".join(map(repr, _EMI_EQUIV)),
+        equiv="),\n    set(".join(map(repr, all_alias_groups)),
     )
     (BASE_PATH / "emissions.py").write_text(code)
 
