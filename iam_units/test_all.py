@@ -114,17 +114,21 @@ def test_convert_gwp(units, metric, species_in, species_out, expected_value):
     assert_array_almost_equal(result.magnitude, expected)
 
 
-def test_convert_gwp_carbon():
+@pytest.mark.parametrize(
+    "context",
+    ["AR5GWP100", None],
+)
+def test_convert_gwp_carbon(context):
     # CO2 can be converted to C
     qty = (44.0 / 12, "tonne CO2")
-    result = convert_gwp("AR5GWP100", qty, "C")
+    result = convert_gwp(context, qty, "C")
     assert result.units == registry("tonne")
     assert_almost_equal(result.magnitude, 1.0)
 
     # C can be converted to CO2
     qty = (1, "tonne C")
     expected = registry.Quantity(44.0 / 12, "tonne")
-    assert convert_gwp("AR5GWP100", qty, "CO2e") == expected
+    assert convert_gwp(context, qty, "CO2e") == expected
 
 
 @pytest.mark.parametrize(
