@@ -4,6 +4,11 @@
 
 import re
 
+GWP_VERSION = "0.7.0"
+
+# All available metrics usable with convert_gwp().
+METRICS = ["SARGWP100", "AR4GWP100", "AR5GWP100", "AR5CCFGWP100", "AR6GWP100"]
+
 # All recognised emission species usable with convert_gwp(). See *pattern*.
 SPECIES = [
     "CO2",
@@ -18,6 +23,8 @@ SPECIES = [
     "C4F10",
     "C5F12",
     "C6F14",
+    "C7F16",
+    "C8F18",
     "CCl4",
     "CF4",
     "CFC11",
@@ -81,11 +88,13 @@ SPECIES = [
     "HFE356pcc3",
     "HFE356pcf2",
     "HFE356pcf3",
+    "HFE365mcf3",
     "HFE374pc2",
     "HFE4310pccc124",
     "HFE449sl",
     "HFE569sf2",
     "Halon1201",
+    "Halon1202",
     "Halon1211",
     "Halon1301",
     "Halon2402",
@@ -94,6 +103,7 @@ SPECIES = [
     "PFPMIE",
     "SF5CF3",
     "SF6",
+    "SO2F2",
     "cC3F6",
     "cC4F8",
 ]

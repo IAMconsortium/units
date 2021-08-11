@@ -30,7 +30,6 @@
     a_HCFC141b = 600.0
     a_HCFC142b = 1800.0
     a_HCFC22 = 1500.0
-    a_HCFE235da2 = 350.0
     a_HFC125 = 2800.0
     a_HFC134 = 1000.0
     a_HFC134a = 1300.0
@@ -44,18 +43,6 @@
     a_HFC32 = 650.0
     a_HFC41 = 150.0
     a_HFC4310mee = 1300.0
-    a_HFE125 = 14900.0
-    a_HFE134 = 6320.0
-    a_HFE143a = 756.0
-    a_HFE236ca12 = 2800.0
-    a_HFE245cb2 = 708.0
-    a_HFE245fa2 = 659.0
-    a_HFE347mcc3 = 575.0
-    a_HFE347pcf2 = 580.0
-    a_HFE356pcc3 = 110.0
-    a_HFE4310pccc124 = 1870.0
-    a_HFE449sl = 297.0
-    a_HFE569sf2 = 59.0
     a_Halon1301 = 5400.0
     a_N2O = 310.0
     a_SF6 = 23900.0
