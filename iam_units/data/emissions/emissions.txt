@@ -16,6 +16,4 @@ a_CO2 = 1.0
 
 # Define contexts for each set of metrics
 
-@import AR5GWP100.txt
-@import AR4GWP100.txt
-@import SARGWP100.txt
+@import metrics.txt

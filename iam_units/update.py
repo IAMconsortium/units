@@ -70,6 +70,14 @@ pattern = re.compile(
     + r')(?=[ -/]|[^\w]|$)')
 """
 
+# Format string for list of metrics.
+_EMI_METRICS = f"""{_EMI_HEADER}
+
+# Define contexts for each set of metrics
+
+{{metrics}}
+"""
+
 # Equivalents: different symbols for the same species.
 _EMI_EQUIV = {
     "CO2": {
@@ -106,13 +114,19 @@ def emissions():
     all_alias_groups = list([key, *value] for key, value in _EMI_EQUIV.items())
     all_symbols = list(chain(*all_alias_groups, symbols))
 
-    # Format and write
+    # Format and write `emissions.py`
     code = _EMI_CODE.format(
         metrics="',\n    '".join(list(data.columns)),
         symbols="',\n    '".join(all_symbols),
         equiv="),\n    set(".join(map(repr, all_alias_groups)),
     )
     (BASE_PATH / "emissions.py").write_text(code)
+
+    # Format and write `metrics.txt"`
+    code = _EMI_METRICS.format(
+        metrics="\n".join([f"@import {m}.txt" for m in data.columns])
+    )
+    (data_path / "metrics.txt").write_text(code)
 
     # Write one file containing a context for each metric
     for metric in data.columns:
