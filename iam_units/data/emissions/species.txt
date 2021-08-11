@@ -5,7 +5,8 @@
 a_CO2_eq = a_CO2
 a_CO2e = a_CO2
 a_CO2eq = a_CO2
-a_Ce = a_C
+a_C = 44. / 12 * a_CO2
+a_Ce = 44. / 12 * a_CO2
 a_C10F18 = NaN
 a_C2F6 = NaN
 a_C3F8 = NaN

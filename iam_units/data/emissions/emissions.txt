@@ -7,10 +7,6 @@ _gwp = [_GWP]
 
 a_CO2 = 1.0
 
-# Conversion to/from carbon equivalent is the same regardless of metric.
-
-a_C = 44. / 12
-
 # Define:
 # - Equivalents, e.g. a_CO2e = a_CO2.
 # - Conversion factors for each species, with NaN values. pint requires
