@@ -2,7 +2,8 @@ import sys
 from itertools import chain
 from pathlib import Path
 
-import pandas as pd
+# This package is only required when updating the emissions GWP conversion factors
+import globalwarmingpotentials as gwp  # type: ignore
 
 # Base path for package code
 BASE_PATH = Path(__file__).parent
@@ -45,6 +46,13 @@ _EMI_DATA = f"""{_EMI_HEADER}
 _EMI_CODE = fr"""{_EMI_HEADER}
 import re
 
+GWP_VERSION = '{gwp.__version__}'
+
+# All available metrics usable with convert_gwp().
+METRICS = [
+    '{{metrics}}'
+]
+
 # All recognised emission species usable with convert_gwp(). See *pattern*.
 SPECIES = [
     '{{symbols}}',
@@ -60,6 +68,14 @@ pattern = re.compile(
     '(?<=[ -])('
     + '|'.join(SPECIES)
     + r')(?=[ -/]|[^\w]|$)')
+"""
+
+# Format string for list of metrics.
+_EMI_METRICS = f"""{_EMI_HEADER}
+
+# Define contexts for each set of metrics
+
+{{metrics}}
 """
 
 # Equivalents: different symbols for the same species.
@@ -78,19 +94,9 @@ def emissions():
     """Update emissions definitions files."""
     data_path = DATA_PATH / "emissions"
 
-    # - Load data.
-    # - Sort by symbol.
-    # - Convert to long form with 'metric' and 'value' columns.
-    # - Drop missing values.
-    data = (
-        pd.read_csv(data_path / "metric_conversions.csv")
-        .sort_values("Symbol")
-        .melt(id_vars=["Species", "Symbol"], var_name="metric")
-        .dropna(subset=["value"])
-    )
-
-    # List of symbols requiring a GWP context to covert
-    symbols = sorted(data["Symbol"].unique())
+    # Import data from `globalwarmingpotentials`, get list of species aka symbols.
+    data = gwp.as_frame().sort_index()
+    symbols = data.index
 
     # Format and write the species defs file
     lines = [_EMI_HEADER]
@@ -108,17 +114,26 @@ def emissions():
     all_alias_groups = list([key, *value] for key, value in _EMI_EQUIV.items())
     all_symbols = list(chain(*all_alias_groups, symbols))
 
-    # Format and write
+    # Format and write `emissions.py`
     code = _EMI_CODE.format(
+        metrics="',\n    '".join(list(data.columns)),
         symbols="',\n    '".join(all_symbols),
         equiv="),\n    set(".join(map(repr, all_alias_groups)),
     )
     (BASE_PATH / "emissions.py").write_text(code)
 
+    # Format and write `metrics.txt"`
+    code = _EMI_METRICS.format(
+        metrics="\n".join([f"@import {m}.txt" for m in data.columns])
+    )
+    (data_path / "metrics.txt").write_text(code)
+
     # Write one file containing a context for each metric
-    for metric, _data in data.groupby("metric"):
+    for metric in data.columns:
         # Conversion factor definitions
-        defs = [f"a_{row.Symbol} = {row.value}" for _, row in _data.iterrows()]
+        defs = [
+            f"a_{species} = {value}" for species, value in data[metric].dropna().items()
+        ]
 
         # Format the template with the definitions
         content = _EMI_DATA.format(metric=metric, defs="\n    ".join(defs))

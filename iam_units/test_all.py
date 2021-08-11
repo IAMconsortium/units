@@ -4,7 +4,7 @@ import pytest
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from pint.util import UnitsContainer
 
-from iam_units import convert_gwp, format_mass, registry
+from iam_units import convert_gwp, emissions, format_mass, registry
 
 DEFAULTS = pint.get_application_registry()
 
@@ -54,6 +54,14 @@ def test_kt():
         pint.UnitRegistry()("kt").to("Mt")
 
 
+def test_emissions_gwp_versions():
+    assert isinstance(emissions.GWP_VERSION, str)
+
+
+def test_emissions_metrics():
+    assert "SARGWP100" in emissions.METRICS
+
+
 def test_emissions_internal():
     # Dummy units can be created
     registry("0.5 _gwp").dimensionality == {"[_GWP]": 1.0}
@@ -78,6 +86,8 @@ def test_emissions_internal():
 @pytest.mark.parametrize(
     "metric, species_in, species_out, expected_value",
     [
+        ("AR6GWP100", "CH4", "CO2", 27.9),
+        ("AR5CCFGWP100", "CH4", "CO2", 34),
         ("AR5GWP100", "CH4", "CO2", 28),
         ("AR5GWP100", "CH4", "CO2e", 28),
         ("AR4GWP100", "CH4", "CO2", 25),
@@ -94,13 +104,19 @@ def test_convert_gwp(units, metric, species_in, species_out, expected_value):
     # Bare masses can be converted
     qty = registry.Quantity(1.0, units.format(""))
     expected = registry(f"{expected_value} {units}")
-    assert convert_gwp(metric, qty, species_in, species_out) == expected
+
+    observed = convert_gwp(metric, qty, species_in, species_out)
+    assert observed.units == expected.units
+    np.testing.assert_almost_equal(observed.magnitude, expected.magnitude)
 
     # '[mass] [speciesname] (/ [time])' can be converted; the input species is extracted
     # from the *qty* argument
     qty = "1.0 " + units.format(species_in)
     expected = registry(f"{expected_value} {units}")
-    assert convert_gwp(metric, qty, species_out) == expected
+
+    observed = convert_gwp(metric, qty, species_out)
+    assert observed.units == expected.units
+    np.testing.assert_almost_equal(observed.magnitude, expected.magnitude)
 
     # Tuple of (vector magnitude, unit expression) can be converted where the
     # the unit expression contains the input species name

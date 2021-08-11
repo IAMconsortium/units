@@ -23,9 +23,10 @@ def convert_gwp(metric, quantity, *species):
 
     Parameters
     ----------
-    metric : 'SARGWP100' or 'AR4GWP100' or 'AR5GWP100' or None
+    metric : str or None
         Metric conversion factors to use. May be :obj:`None` if the input and
         output species are the same.
+        Use :code:`iam_units.emissions.METRICS` for a list of available metrics.
     quantity : str or pint.Quantity or tuple
         Quantity to convert. If a tuple of (magnitude, unit), these are passed
         as arguments to :class:`pint.Quantity`.
@@ -39,6 +40,13 @@ def convert_gwp(metric, quantity, *species):
     -------
     pint.Quantity
         `quantity` converted from the input to output species.
+
+    Notes
+    -----
+    The conversion factors are taken from the `globalwarmingpotentials` package,
+    see https://github.com/openclimatedata/globalwarmingpotentials.
+    You can use :code:`iam_units.emissions.GWP_VERSION` to check from which version
+    of that package the conversion tables in the `iam_units` package were generated.
     """
     # Handle *species*: either (in, out) or only out
     try:

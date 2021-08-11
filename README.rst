@@ -76,19 +76,9 @@ Emissions and GWP
 
 The function ``convert_gwp()`` converts from from mass (or mass-related units) of one specific greenhouse gas (GHG) species to an equivalent quantity of second species, based on `global warming potential`_ (GWP) *metrics*.
 The supported species are listed in `species.txt`_ and the variable ``iam_units.emissions.SPECIES``.
-The metrics have names like ``<IPCC report>GWP<years>``, where ``<years>`` is `100` and:
 
-.. list-table::
-   :header-rows: 1
-
-   - - ``<IPCC report>``
-     - Meaning
-   - - ``SAR``
-     - Second Assessment Report (1995)
-   - - ``AR4``
-     - Fourth Assessment Report (2007)
-   - - ``AR5``
-     - Fifth Assessment Report (2014)
+The metrics have names like ``<IPCC report>GWP<years>``, where ``<years>`` is the time period over which heat absorption was assessed.
+The supported metrics are listed in the variable ``iam_units.emissions.METRICS``.
 
 .. code-block:: python
 
@@ -139,9 +129,9 @@ See `Pint's formatting documentation`_ for values of the *spec* argument.
 
 Data sources
 ~~~~~~~~~~~~
-The GWP unit definitions are generated using the file metric_conversions.csv.
-The file is copied from `lewisjared/scmdata`_ v0.4, authored by `@lewisjared <https://github.com/lewisjared>`_, `@swillner <https://github.com/swillner>`_, and `@znicholls <https://github.com/znicholls>`_ and licensed under BSD-3.
-The version in scmdata was transcribed from `this source`_ (PDF link).
+
+The GWP unit definitions are generated from the package globalwarmingpotentials_.
+The version of that package used to generate the definitions is stated in the variable ``iam_units.emissions.GWP_VERSION``.
 
 See `<DEVELOPING.rst>`_ for details on updating the definitions.
 
@@ -149,8 +139,7 @@ See `<DEVELOPING.rst>`_ for details on updating the definitions.
 .. _International Vocabulary of Metrology: https://www.bipm.org/utils/common/documents/jcgm/JCGM_200_2008.pdf
 .. _contexts: https://pint.readthedocs.io/en/latest/contexts.html
 .. _Pint's formatting documentation: https://pint.readthedocs.io/en/latest/tutorial.html#string-formatting
-.. _lewisjared/scmdata: https://github.com/lewisjared/scmdata/tree/v0.4.0/src/scmdata/data
-.. _this source: https://www.ghgprotocol.org/sites/default/files/ghgp/Global-Warming-Potential-Values%20%28Feb%2016%202016%29_1.pdf
+.. _globalwarmingpotentials: https://github.com/openclimatedata/globalwarmingpotentials
 
 
 Tests and development

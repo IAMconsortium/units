@@ -1,0 +1,12 @@
+# This file was generated using:
+#    python -m iam_units.update emissions
+# DO NOT ALTER THIS FILE MANUALLY!
+
+
+# Define contexts for each set of metrics
+
+@import SARGWP100.txt
+@import AR4GWP100.txt
+@import AR5GWP100.txt
+@import AR5CCFGWP100.txt
+@import AR6GWP100.txt
