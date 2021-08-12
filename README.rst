@@ -74,7 +74,7 @@ Technical details
 Emissions and GWP
 -----------------
 
-The function ``convert_gwp()`` converts from from mass (or mass-related units) of one specific greenhouse gas (GHG) species to an equivalent quantity of second species, based on `global warming potential`_ (GWP) *metrics*.
+The function ``convert_gwp()`` converts from mass (or mass-related units) of one specific greenhouse gas (GHG) species to an equivalent quantity of second species, based on `global warming potential`_ (GWP) *metrics*.
 The supported species are listed in `species.txt`_ and the variable ``iam_units.emissions.SPECIES``.
 
 The metrics have names like ``<IPCC report>GWP<years>``, where ``<years>`` is the time period over which heat absorption was assessed.
