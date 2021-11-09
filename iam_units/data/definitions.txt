@@ -44,6 +44,7 @@ quadrillion = 1e15
 EUR_2005 = [currency] = EUR
 EUR_2000 = 1.0564 * EUR_2005
 EUR_2010 = 0.9463 * EUR_2005
+EUR_2020 = 0.8017 * EUR_2005
 
 # Exchange rate EUR/USD in 2005, data from
 # https://data.oecd.org/conversion/exchange-rates.htm
