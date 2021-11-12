@@ -9,6 +9,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        pint-version:
+        # Force specific version of pint
+        - "==0.17"
+        - "==0.18"
+        # No change, i.e. latest
+        - ""
+
+    name: pint${{ matrix.pint-version }}
+
     steps:
     - uses: actions/checkout@v2
 
@@ -21,6 +33,7 @@ jobs:
       run: |
         pip install numpy pytest pytest-cov setuptools-scm
         pip install --editable .
+        pip install pint${{ matrix.pint-version }}
         pytest -rA --verbose --color=yes --cov=iam_units --cov-report=xml
 
     - name: Upload test coverage to Codecov.io
