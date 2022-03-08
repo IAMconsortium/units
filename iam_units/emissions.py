@@ -110,7 +110,7 @@ SPECIES = [
 
 # Sets of symbols that refer to the same species and are interchangeable.
 EQUIV = [
-    set(["CO2", "CO2_eq", "CO2e", "CO2eq", "CO2-eq", "C", "Ce"]),
+    set(["CO2", "CO2_eq", "CO2e", "CO2eq", "C", "Ce"]),
 ]
 
 # Regular expression for one *SPECIES* in a pint-compatible unit string.
