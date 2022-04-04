@@ -18,6 +18,7 @@ jobs:
         # Force specific version of pint
         - "==0.17"
         - "==0.18"
+        - "==0.19"
         # No change, i.e. latest
         - ""
 
