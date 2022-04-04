@@ -43,7 +43,7 @@ _EMI_DATA = f"""{_EMI_HEADER}
 # - Preceded by a space or '-' character.
 # - Followed by a space, '-', '/', end-of-string, or non-word (\w) character.
 #   The latter avoids matching only the 'C' within 'CH4'.
-_EMI_CODE = fr"""{_EMI_HEADER}
+_EMI_CODE = rf"""{_EMI_HEADER}
 import re
 
 GWP_VERSION = '{gwp.__version__}'
