@@ -85,7 +85,6 @@
     a_HFE365mcf3 = 1
     a_HFE374pc2 = 758
     a_HFE4310pccc124 = 3353
-    a_HFE449sl = 509
     a_HFE569sf2 = 69
     a_Halon1201 = 454
     a_Halon1202 = 280
