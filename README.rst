@@ -9,7 +9,7 @@ Unit definitions for integrated-assessment research
    :target: https://github.com/IAMconsortium/units/actions/workflows/test.yaml
    :alt: Build status
 
-© 2020–2021 `IAM-units authors`_; licensed under the `GNU GPL version 3`_.
+© 2020–2022 `IAM-units authors`_; licensed under the `GNU GPL version 3`_.
 
 The file `definitions.txt`_ gives `Pint`_-compatible definitions of energy, climate, and related units to supplement the SI and other units included in Pint's `default_en.txt`_.
 These definitions are used by:
