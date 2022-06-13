@@ -86,6 +86,7 @@ def test_emissions_internal():
 @pytest.mark.parametrize(
     "metric, species_in, species_out, expected_value",
     [
+        ("AR6GWP20", "CH4", "CO2", 81.2),
         ("AR6GWP100", "CH4", "CO2", 27.9),
         ("AR5CCFGWP100", "CH4", "CO2", 34),
         ("AR5GWP100", "CH4", "CO2", 28),
