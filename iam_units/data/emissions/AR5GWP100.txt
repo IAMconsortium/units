@@ -82,10 +82,8 @@
     a_HFE356pcc3 = 413.0
     a_HFE356pcf2 = 719.0
     a_HFE356pcf3 = 446.0
-    a_HFE365mcf3 = 1.0
     a_HFE374pc2 = 627.0
     a_HFE4310pccc124 = 2820.0
-    a_HFE449sl = 421.0
     a_HFE569sf2 = 57.0
     a_Halon1201 = 376.0
     a_Halon1211 = 1750.0

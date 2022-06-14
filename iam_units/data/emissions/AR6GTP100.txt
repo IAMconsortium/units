@@ -1,0 +1,100 @@
+# This file was generated using:
+#    python -m iam_units.update emissions
+# DO NOT ALTER THIS FILE MANUALLY!
+
+@context(_a=NaN) AR6GTP100
+    [mass] -> [_GWP]: value * (_a * _gwp / kg)
+    [_GWP] -> [mass]: value / (_a * _gwp / kg)
+    [mass] / [time] -> [_GWP] / [time]: value * (_a * _gwp / kg)
+    [_GWP] / [time] -> [mass] / [time]: value / (_a * _gwp / kg)
+    [mass] / [time] / [area] -> [_GWP] / [time] / [area]: value * (_a * _gwp / kg)
+    [_GWP] / [time] / [area] -> [mass] / [time] / [area]: value / (_a * _gwp / kg)
+
+
+    a_C10F18 = 9010.0
+    a_C2F6 = 15200.0
+    a_C3F8 = 11200.0
+    a_C4F10 = 12100.0
+    a_C5F12 = 11200.0
+    a_C6F14 = 10500.0
+    a_C7F16 = 10200.0
+    a_C8F18 = 10000.0
+    a_CCl4 = 810.0
+    a_CF4 = 9050.0
+    a_CFC11 = 3540.0
+    a_CFC113 = 5210.0
+    a_CFC114 = 9410.0
+    a_CFC115 = 11000.0
+    a_CFC12 = 10400.0
+    a_CFC13 = 18800.0
+    a_CH2Cl2 = 2.01
+    a_CH3Br = 0.438
+    a_CH3CCl3 = 29.7
+    a_CH3Cl = 1.0
+    a_CH4 = 5.38
+    a_CHCl3 = 3.72
+    a_HCFC123 = 16.4
+    a_HCFC124 = 110.0
+    a_HCFC141b = 162.0
+    a_HCFC142b = 514.0
+    a_HCFC21 = 29.0
+    a_HCFC22 = 379.0
+    a_HCFC225ca = 24.8
+    a_HCFC225cb = 105.0
+    a_HCFE235da2 = 98.4
+    a_HFC125 = 1300.0
+    a_HFC134 = 239.0
+    a_HFC134a = 306.0
+    a_HFC143 = 66.6
+    a_HFC143a = 3250.0
+    a_HFC152 = 3.89
+    a_HFC152a = 29.8
+    a_HFC161 = 0.872
+    a_HFC227ea = 1490.0
+    a_HFC23 = 15100.0
+    a_HFC236cb = 268.0
+    a_HFC236ea = 288.0
+    a_HFC236fa = 8870.0
+    a_HFC245ca = 146.0
+    a_HFC245fa = 180.0
+    a_HFC32 = 142.0
+    a_HFC365mfc = 172.0
+    a_HFC41 = 24.6
+    a_HFC4310mee = 347.0
+    a_HFE125 = 13100.0
+    a_HFE134 = 2060.0
+    a_HFE143a = 113.0
+    a_HFE227ea = 4440.0
+    a_HFE236ca12 = 1860.0
+    a_HFE236ea2 = 521.0
+    a_HFE236fa = 205.0
+    a_HFE245cb2 = 137.0
+    a_HFE245fa1 = 173.0
+    a_HFE245fa2 = 162.0
+    a_HFE329mcc2 = 1090.0
+    a_HFE338mcf2 = 194.0
+    a_HFE338pcc13 = 657.0
+    a_HFE347mcc3 = 106.0
+    a_HFE347mcf2 = 179.0
+    a_HFE347pcf2 = 181.0
+    a_HFE356mec3 = 48.0
+    a_HFE356pcc3 = 50.4
+    a_HFE356pcf2 = 154.0
+    a_HFE356pcf3 = 88.4
+    a_HFE365mcf3 = 0.289
+    a_HFE374pc2 = 2.25
+    a_HFE4310pccc124 = 647.0
+    a_HFE569sf2 = 11.0
+    a_Halon1201 = 69.8
+    a_Halon1202 = 39.3
+    a_Halon1211 = 406.0
+    a_Halon1301 = 5060.0
+    a_Halon2402 = 702.0
+    a_N2O = 233.0
+    a_NF3 = 20000.0
+    a_PFPMIE = 12000.0
+    a_SF5CF3 = 21600.0
+    a_SF6 = 30600.0
+    a_SO2F2 = 1920.0
+    a_cC4F8 = 12400.0
+@end
