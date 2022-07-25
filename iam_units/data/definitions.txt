@@ -1,17 +1,23 @@
 # Energy
 
 # Energy content of coal by mass
-# Source: https://cngcenter.com/wp-content/uploads/2013/09/UnitsAndConversions.pdf
+# Source: https://cngcenter.com/wp-content/uploads/2013/09/UnitsAndConversions.pdf (1)
 #
 # - tonne_of_oil_equivalent is already defined in pint's default_en.txt
 
 tonne_of_coal_equivalent = 29.308 GJ = tce
 
 # Energy content of gasoline by volume
-# Source: https://theicct.org/sites/default/files/publications/GFEI_WP19_Final_V3_Web.pdf
+# Source: https://theicct.org/sites/default/files/publications/GFEI_WP19_Final_V3_Web.pdf (2)
 # page 24, footnote 23.
 
 litre_of_gasoline_equivalent = 33.5 * MJ = Lge = lge
+# litre_of_gasoline_equivalent = 32.1 * MJ = Lge = lge  # from source (1)
+
+# Energy content of diesel by volume (lower heating value)
+# Source: (1)
+
+litre_of_diesel_equivalent = 35.8 * MJ = Lde = lde
 
 # Short form of Watt-annum
 Wa = watt * year
