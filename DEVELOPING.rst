@@ -18,19 +18,20 @@ Thus:
 Releasing
 =========
 
+Before releasing, check https://github.com/IAMconsortium/units/actions/workflows/test.yaml to ensure that the push and scheduled builds are passing.
+Address any failures before releasing.
 
-Releasing
-*********
+1. Create a new branch::
 
-1. Before releasing, check https://github.com/IAMconsortium/units/actions/workflows/test.yaml to ensure that the push and scheduled builds are passing.
-   Address any failures before releasing.
+    $ git checkout -b release/vYYYY.MM.DD
 
-2. Tag the release candidate version, i.e. with a ``rcN`` suffix, and push::
+2. Tag the release candidate (RC) version, i.e. with a ``rcN`` suffix, and push::
 
     $ git tag v2021.3.22rc1
-    $ git push --tags origin main
+    $ git push --tags origin release/vYYYY.MM.DD
 
-3. Check:
+3. Open a PR with the title “Release vYYYY.MM.DD” using this branch.
+   Check:
 
    - at https://github.com/IAMconsortium/units/actions/workflows/publish.yaml that the workflow completes: the package builds successfully and is published to TestPyPI.
    - at https://test.pypi.org/project/iam-units/ that:
@@ -41,16 +42,20 @@ Releasing
    Address any warnings or errors that appear.
    If needed, make a new commit and go back to step (2), incrementing the rc number.
 
-4. (optional) Tag the release itself and push::
+4. Merge the PR using the ‘rebase and merge’ method.
 
+5. (optional) Switch back to the ``main`` branch, tag the release itself (*without* an RC number) and push::
+
+    $ git checkout main
+    $ git pull --fast-forward
     $ git tag v2021.3.22
     $ git push --tags origin main
 
-   This step (but *not* step (2)) can also be performed directly on GitHub; see (5), next.
+   This step (but *not* step (2)) can also be performed directly on GitHub; see (6), next.
 
-5. Visit https://github.com/IAMconsortium/units/releases and mark the new release: either using the pushed tag from (4), or by creating the tag and release simultaneously.
+6. Visit https://github.com/IAMconsortium/units/releases and mark the new release: either using the pushed tag from (5), or by creating the tag and release simultaneously.
 
-6. Check at https://github.com/IAMconsortium/units/actions/workflows/publish.yaml and https://pypi.org/project/iam-units/ that the distributions are published.
+7. Check at https://github.com/IAMconsortium/units/actions/workflows/publish.yaml and https://pypi.org/project/iam-units/ that the distributions are published.
 
 
 Generated data files for GWP contexts
