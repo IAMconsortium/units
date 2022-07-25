@@ -21,6 +21,11 @@ PARAMS = [
     ("tce", energy, True),
     ("toe", energy, False),
     ("EUR_2005", UnitsContainer({"[currency]": 1}), True),
+    (
+        "billion tkm/yr",
+        UnitsContainer({"[length]": 1, "[mass]": 1, "[time]": -1}),
+        True,
+    ),
 ]
 
 

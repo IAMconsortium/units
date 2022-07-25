@@ -61,10 +61,9 @@ USD_2010 = USD_2005 * 83.426 / 91.718
 
 vehicle = [vehicle] = v
 passenger = [passenger] = p = pass
-tonne_freight = [tonne_freight] = tfr = tonnef
 vkm = vehicle * kilometer
 pkm = passenger * kilometer
-tkm = tonne_freight * kilometer
+tkm = tonne * kilometer
 @alias vkm = vkt = v km
 @alias pkm = pkt = p km
 @alias tkm = tkt = t km
