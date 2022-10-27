@@ -70,9 +70,9 @@ passenger = [passenger] = p = pass
 vkm = vehicle * kilometer
 pkm = passenger * kilometer
 tkm = tonne * kilometer
-@alias vkm = vkt = v km
-@alias pkm = pkt = p km
-@alias tkm = tkt = t km
+@alias vkm = vkt = v_km
+@alias pkm = pkt = p_km
+@alias tkm = tkt = t_km
 
 # Emissions of various greenhouse gases
 @import emissions/emissions.txt
