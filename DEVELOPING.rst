@@ -23,12 +23,12 @@ Address any failures before releasing.
 
 1. Create a new branch::
 
-    $ git checkout -b release/vYYYY.MM.DD
+    $ git checkout -b release/YYYY.MM.DD
 
 2. Tag the release candidate (RC) version, i.e. with a ``rcN`` suffix, and push::
 
     $ git tag v2021.3.22rc1
-    $ git push --tags origin release/vYYYY.MM.DD
+    $ git push --tags origin release/YYYY.MM.DD
 
 3. Open a PR with the title “Release vYYYY.MM.DD” using this branch.
    Check:
