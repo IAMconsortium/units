@@ -1,13 +1,16 @@
 from pathlib import Path
+from warnings import warn
 
 import pint
 from pint.formatting import format_unit
 from pint.util import to_units_container
 
 from . import emissions
+from .currency import configure_currency
 
 __all__ = [
     "convert_gwp",
+    "configure_currency",
     "format_mass",
     "registry",
 ]
@@ -16,6 +19,15 @@ __all__ = [
 # Package registry using definitions.txt
 registry = pint.UnitRegistry()
 registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
+
+
+warn(
+    'configure_currency("EXC", "2005") will no longer be the default in some future '
+    "version of iam-units. Code that relies on multiple-currency conversions should be "
+    "updated to call this function explicitly.",
+    DeprecationWarning,
+)
+configure_currency("EXC", "2005")
 
 
 def convert_gwp(metric, quantity, *species):
