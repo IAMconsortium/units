@@ -100,7 +100,7 @@ def emissions():
 
     # Format and write the species defs file
     lines = [_EMI_HEADER]
-    for (species, alias) in _EMI_EQUIV.items():
+    for species, alias in _EMI_EQUIV.items():
         lines.extend(
             f"a_{a} = {factor or ''}a_{species}" for a, factor in alias.items()
         )
