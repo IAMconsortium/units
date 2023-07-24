@@ -149,7 +149,7 @@ Currency
 - USD (United States dollar) for annual periods from 2000 to 2022 inclusive.
 - EUR (Euro) for the periods 2005, 2010, 2015, and 2020 only.
 
-These are referred to by pint-compatible units like ``USD_2019``, combining the `ISO 4217`_ currency code with the period.
+These can be used via pint-compatible unit expressions like ``USD_2019`` that combine the `ISO 4217`_ alphabetic code with the period.
 
 To enable conversions between *different* currencies, use the function ``configure_currency()``:
 
@@ -157,19 +157,19 @@ To enable conversions between *different* currencies, use the function ``configu
 
    >>> configure_currency(method="EXC", period="2005")
 
-   # Then, for example:
+   # Then, for example
    >>> qty = registry("42.1 USD_2020")
    >>> qty
-    42.1 <Unit('USD_2020')>
+   42.1 <Unit('USD_2020')>
 
    >>> qty.to("EUR_2005")
    26.022132012144635 <Unit('EUR_2005')>
 
 Currently ``iam_units`` only supports:
 
-- Period-average exchange rates for annual periods (method="EXC");
-- period="2005";
-- The two currencies mentioned above.
+- period-average exchange rates for annual periods (method="EXC");
+- period="2005"; and
+- the two currencies mentioned above.
 
 Contributions that extend the supported currencies, methods, and periods are welcome.
 
