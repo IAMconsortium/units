@@ -141,6 +141,39 @@ See `<DEVELOPING.rst>`_ for details on updating the definitions.
 .. _Pint's formatting documentation: https://pint.readthedocs.io/en/latest/tutorial.html#string-formatting
 .. _globalwarmingpotentials: https://github.com/openclimatedata/globalwarmingpotentials
 
+Currency
+--------
+
+``iam_units`` defines deflators for:
+
+- USD (United States dollar) for annual periods from 2000 to 2022 inclusive.
+- EUR (Euro) for the periods 2005, 2010, 2015, and 2020 only.
+
+These are referred to by pint-compatible units like ``USD_2019``, combining the `ISO 4217`_ currency code with the period.
+
+To enable conversions between *different* currencies, use the function ``configure_currency()``:
+
+.. code-block:: python
+
+   >>> configure_currency(method="EXC", period="2005")
+
+   # Then, for example:
+   >>> qty = registry("42.1 USD_2020")
+   >>> qty
+    42.1 <Unit('USD_2020')>
+
+   >>> qty.to("EUR_2005")
+   26.022132012144635 <Unit('EUR_2005')>
+
+Currently ``iam_units`` only supports:
+
+- Period-average exchange rates for annual periods (method="EXC");
+- period="2005";
+- The two currencies mentioned above.
+
+Contributions that extend the supported currencies, methods, and periods are welcome.
+
+.. _ISO 4217: https://en.wikipedia.org/wiki/ISO_4217#Active_codes_(List_One)
 
 Tests and development
 =====================
@@ -156,7 +189,7 @@ See `<DEVELOPING.rst>`_ for further details.
 .. _checks.csv: ./iam_units/data/checks.csv
 .. _Pint: https://pint.readthedocs.io
 .. _default_en.txt: https://github.com/hgrecco/pint/blob/master/pint/default_en.txt
-.. _MESSAGEix-GLOBIOM: https://docs.messageix.org
+.. _MESSAGEix-GLOBIOM: https://docs.messageix.org/models/
 .. _pyam: https://pyam-iamc.readthedocs.io
 .. _pyam.IamDataFrame.convert_unit(): https://pyam-iamc.readthedocs.io/en/stable/api/iamdataframe.html#pyam.IamDataFrame.convert_unit
 .. _issue: https://github.com/IAMconsortium/units/issues
