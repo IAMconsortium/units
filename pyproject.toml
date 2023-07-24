@@ -1,0 +1,53 @@
+[build-system]
+requires = ["build", "setuptools-scm"]
+
+[project]
+dynamic = ["version"]
+name = "iam_units"
+description = "Unit definitions for integrated-assessment research"
+authors = [
+  {name = "IAM-units contributors"}
+]
+maintainers = [
+  {name = "Paul Natsuo Kishimoto", email = "mail@paul.kishimoto.name"}
+]
+license = {file = "LICENSE"}
+readme = "README.rst"
+classifiers = [
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+  "pint >= 0.11"
+]
+
+[project.urls]
+homepage = "https://github.com/IAMconsortium/units"
+
+[project.optional-dependencies]
+update = ["globalwarmingpotentials"]
+
+[tool.isort]
+profile = "black"
+
+[[tool.mypy.overrides]]
+# Packages/modules for which no type hints are available
+module = [
+  "pandas.*"
+]
+ignore_missing_imports = true
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools_scm]
