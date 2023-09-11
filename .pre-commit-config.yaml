@@ -1,0 +1,25 @@
+repos:
+- repo: local
+  hooks:
+  - id: mypy
+    name: mypy
+    always_run: true
+    require_serial: true
+    pass_filenames: false
+
+    language: python
+    entry: bash -c "mypy $0 $@"
+    additional_dependencies:
+    - mypy
+    - numpy
+    - pint
+    - pytest
+    args: ["."]
+- repo: https://github.com/psf/black-pre-commit-mirror
+  rev: 23.7.0
+  hooks:
+  - id: black
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.0.287
+  hooks:
+  - id: ruff
