@@ -91,6 +91,7 @@ def test_emissions_internal():
         "t {}",  # Mass
         "Mt {} / a",  # Mass rate
         "kt {} / (ha * yr)",  # Mass flux
+        "kt {} / J",  # Mass per unit energy
     ],
 )
 @pytest.mark.parametrize(

@@ -105,7 +105,8 @@ def convert_gwp(metric, quantity, *species):
 
     # Construct intermediate units with the same dimensionality as *quantity*,
     # except '[mass]' replaced with the dummy unit '_gwp'
-    dummy = quantity.units / registry.Unit("tonne / _gwp")
+    m_dim = quantity.dimensionality["[mass]"]
+    dummy = quantity.units / registry.Unit(f"tonne ** {m_dim} / _gwp")
 
     # Convert to dummy units using 'a' for the input species; then back to the
     # input units using 'a' for the output species.

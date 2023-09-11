@@ -3,6 +3,7 @@ __pycache__
 .benchmarks
 .mypy_cache
 .pytest_cache
+.ruff_cache
 *.egg-info
 *.eggs
 build

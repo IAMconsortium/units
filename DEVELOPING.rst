@@ -34,9 +34,9 @@ Address any failures before releasing.
    Check:
 
    - at https://github.com/IAMconsortium/units/actions/workflows/publish.yaml that the workflow completes: the package builds successfully and is published to TestPyPI.
-   - at https://test.pypi.org/project/iam-units/ that:
+   - at https://pypi.org/project/iam-units/ that:
 
-      - The package can be downloaded, installed and run.
+      - The release candidate package can be downloaded, installed and run.
       - The README is rendered correctly.
 
    Address any warnings or errors that appear.

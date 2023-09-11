@@ -5,13 +5,11 @@ requires = ["build", "setuptools-scm"]
 dynamic = ["version"]
 name = "iam_units"
 description = "Unit definitions for integrated-assessment research"
-authors = [
-  {name = "IAM-units contributors"}
-]
+authors = [{ name = "IAM-units contributors" }]
 maintainers = [
-  {name = "Paul Natsuo Kishimoto", email = "mail@paul.kishimoto.name"}
+  { name = "Paul Natsuo Kishimoto", email = "mail@paul.kishimoto.name" },
 ]
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 readme = "README.rst"
 classifiers = [
   "Intended Audience :: Developers",
@@ -27,25 +25,20 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Information Analysis",
 ]
-dependencies = [
-  "pint >= 0.11"
-]
+dependencies = ["pint >= 0.11"]
 
 [project.urls]
 homepage = "https://github.com/IAMconsortium/units"
 
 [project.optional-dependencies]
 update = ["globalwarmingpotentials"]
+tests = ["numpy", "pandas", "pytest", "pytest-cov"]
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+select = ["C9", "E", "F", "I", "W"]
 
-[[tool.mypy.overrides]]
-# Packages/modules for which no type hints are available
-module = [
-  "pandas.*"
-]
-ignore_missing_imports = true
+[tool.ruff.mccabe]
+max-complexity = 7
 
 [tool.setuptools.packages]
 find = {}

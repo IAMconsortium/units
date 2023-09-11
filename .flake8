@@ -1,3 +1,0 @@
-[flake8]
-# For black
-max-line-length = 88

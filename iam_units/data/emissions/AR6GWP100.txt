@@ -9,6 +9,8 @@
     [_GWP] / [time] -> [mass] / [time]: value / (_a * _gwp / kg)
     [mass] / [time] / [area] -> [_GWP] / [time] / [area]: value * (_a * _gwp / kg)
     [_GWP] / [time] / [area] -> [mass] / [time] / [area]: value / (_a * _gwp / kg)
+    [time] ** 2 / [length] ** 2 -> [_GWP] * [time] ** 2 / [length] ** 2: value * (_a * _gwp)
+    [_GWP] * [time] ** 2 / [length] ** 2 -> [time] ** 2 / [length] ** 2: value / (_a * _gwp)
 
 
     a_C10F18 = 7480.0

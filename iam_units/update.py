@@ -18,12 +18,12 @@ _EMI_HEADER = """# This file was generated using:
 # DO NOT ALTER THIS FILE MANUALLY!
 """
 
-# Format string for individual metrics. To expand the set of supported
-# conversions, duplicate and modify the first pair of lines in the context.
-# Only the portion before of the ':' needs to be modified. Currently supported:
-# 1. Mass
-# 2. Mass rate, i.e. mass per time.
-# 3. Flux, i.e. mass per area per time.
+# Format string for individual metrics. To expand the set of supported conversions,
+# duplicate and modify the first pair of lines in the context. Currently supported:
+# 1. Mass.
+# 2. Mass rate, or mass per time.
+# 3. Flux, or mass per area per time.
+# 4. Mass per unit energy.
 _EMI_DATA = f"""{_EMI_HEADER}
 @context(_a=NaN) {{metric}}
     [mass] -> [_GWP]: value * (_a * _gwp / kg)
@@ -32,6 +32,8 @@ _EMI_DATA = f"""{_EMI_HEADER}
     [_GWP] / [time] -> [mass] / [time]: value / (_a * _gwp / kg)
     [mass] / [time] / [area] -> [_GWP] / [time] / [area]: value * (_a * _gwp / kg)
     [_GWP] / [time] / [area] -> [mass] / [time] / [area]: value / (_a * _gwp / kg)
+    [time] ** 2 / [length] ** 2 -> [_GWP] * [time] ** 2 / [length] ** 2: value * (_a * _gwp)
+    [_GWP] * [time] ** 2 / [length] ** 2 -> [time] ** 2 / [length] ** 2: value / (_a * _gwp)
 
 
     {{defs}}
