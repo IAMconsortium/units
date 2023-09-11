@@ -90,6 +90,20 @@ _EMI_EQUIV = {
 }
 
 
+def currency():
+    """Update currency definitions files."""
+    # Currently no such files exist; see iam_units.currency.configure_currency().
+    #
+    # An implementation here should, at minimum:
+    # - Use the package `sdmx1` to query either the World Bank or OECD SDMX API.
+    # - Confirm these the different data sources give the same results; if not, expose
+    #   to the user an option to select the source.
+    # - Write to a simple text format that can be read by iam_units installation without
+    #   any dependencies; in a directory like iam_units/data/currency, with one file
+    #   per supported combination of (method, period).
+    raise NotImplementedError
+
+
 def emissions():
     """Update emissions definitions files."""
     data_path = DATA_PATH / "emissions"

@@ -4,7 +4,7 @@ import pytest
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from pint.util import UnitsContainer
 
-from iam_units import convert_gwp, emissions, format_mass, registry
+from iam_units import configure_currency, convert_gwp, emissions, format_mass, registry
 
 DEFAULTS = pint.get_application_registry()
 
@@ -57,6 +57,11 @@ def test_kt():
     # A default UnitRegistry should interpret `kt` as velocity
     with pytest.raises(pint.DimensionalityError):
         pint.UnitRegistry()("kt").to("Mt")
+
+
+def test_currency():
+    with pytest.raises(NotImplementedError):
+        configure_currency("PPPGDP", 2010)
 
 
 def test_emissions_gwp_versions():
