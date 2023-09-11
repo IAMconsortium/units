@@ -32,6 +32,7 @@ homepage = "https://github.com/IAMconsortium/units"
 
 [project.optional-dependencies]
 update = ["globalwarmingpotentials"]
+tests = ["numpy", "pandas", "pytest", "pytest-cov"]
 
 [tool.ruff]
 select = ["C9", "E", "F", "I", "W"]
