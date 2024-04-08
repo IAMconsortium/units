@@ -35,11 +35,9 @@ homepage = "https://github.com/IAMconsortium/units"
 update = ["globalwarmingpotentials"]
 tests = ["numpy", "pandas", "pytest", "pytest-cov"]
 
-[tool.ruff]
+[tool.ruff.lint]
+mccabe.max-complexity = 7
 select = ["C9", "E", "F", "I", "W"]
-
-[tool.ruff.mccabe]
-max-complexity = 7
 
 [tool.setuptools.packages]
 find = {}

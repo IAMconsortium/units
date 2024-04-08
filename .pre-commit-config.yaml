@@ -1,25 +1,16 @@
 repos:
-- repo: local
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.18.1
   hooks:
   - id: mypy
-    name: mypy
-    always_run: true
-    require_serial: true
-    pass_filenames: false
-
-    language: python
-    entry: bash -c "mypy $0 $@"
     additional_dependencies:
-    - mypy
     - numpy
     - pint
     - pytest
-    args: ["."]
-- repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 23.7.0
-  hooks:
-  - id: black
+    args: []
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.0.287
+  rev: v0.13.0
   hooks:
-  - id: ruff
+  - id: ruff-check
+  - id: ruff-format
+    args: [ --check ]
