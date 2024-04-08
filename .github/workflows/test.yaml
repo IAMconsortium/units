@@ -45,6 +45,11 @@ jobs:
           -rA -vv --color=yes \
           --cov=iam_units --cov-report=xml
 
+    - name: Test update code
+      run: |
+        # Analogous to "python -m iam_units.update …"
+        coverage run --append -m iam_units.update emissions || exit 0
+
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v5
       with:
