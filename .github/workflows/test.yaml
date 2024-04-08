@@ -23,6 +23,8 @@ jobs:
         - pint-version: ""
           python-version: "3.10"
 
+      fail-fast: false
+
     name: "python:${{ matrix.python-version }} pint:${{ matrix.pint-version }}"
 
     steps:
