@@ -127,7 +127,7 @@ def format_mass(obj, info, spec=None):
         Pint formatting specifier such as "H" (HTML format), "~C" (compact format with
         symbols), etc.
     """
-    spec = spec or obj.default_format
+    spec = spec or registry.formatter.default_format
 
     try:
         # Use only the units of a Quantity object
