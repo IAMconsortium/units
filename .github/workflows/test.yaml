@@ -14,24 +14,23 @@ jobs:
 
     strategy:
       matrix:
-        pint-version:
-        # Force specific version of pint
-        - "==0.17"
-        - "==0.18"
-        - "==0.19.1"
-        # No change, i.e. latest
-        - ""
+        pint-version: ["==0.24.4", ""]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        exclude:
+        # latest version of pint requires minimum 3.11
+        - pint-version: ""
+          python-version: "3.9"
+        - pint-version: ""
+          python-version: "3.10"
 
-    name: pint${{ matrix.pint-version }}
+    name: "python:${{ matrix.python-version }} pint:${{ matrix.pint-version }}"
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v6
       with:
-        python-version: "3.x"
-        cache: pip
-        cache-dependency-path: "**/pyproject.toml"
+        python-version: ${{ matrix.python-version }}
 
     - name: Install
       run: |
@@ -55,8 +54,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
+    - uses: actions/checkout@v5
+    - uses: actions/setup-python@v6
     - name: Force recreation of pre-commit virtual environment for mypy
       if: github.event_name == 'schedule'  # Comment this line to run on a PR
       run: gh cache delete $(gh cache list -L 999 | cut -f2 | grep pre-commit)
