@@ -1,3 +1,5 @@
+import importlib
+
 import numpy as np
 import pint
 import pytest
@@ -181,3 +183,16 @@ def test_format_mass(units_in, species_str, spec, output):
     # Unit object can be formatted
     qty = registry.Unit(units_in)
     assert format_mass(qty, species_str, spec) == output
+
+
+def test_import_warnings(caplog):
+    import iam_units
+
+    importlib.reload(iam_units)
+
+    pint_warning_logs = [
+        log
+        for log in caplog.records
+        if log.name == "pint.util" and log.levelname == "WARNING"
+    ]
+    assert len(pint_warning_logs) == 0
