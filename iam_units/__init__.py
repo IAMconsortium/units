@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from warnings import warn
 
@@ -7,6 +8,8 @@ from pint.util import to_units_container
 
 from . import emissions
 from .currency import configure_currency
+
+logging.getLogger("pint.util").setLevel(logging.ERROR)
 
 __all__ = [
     "convert_gwp",
