@@ -20,7 +20,7 @@ __all__ = [
 # Package registry using definitions.txt
 registry = pint.UnitRegistry()
 pint_util_logger = logging.getLogger("pint.util")
-original_pint_uitl_log_level = pint_util_logger.getEffectiveLevel()
+original_pint_util_log_level = pint_util_logger.getEffectiveLevel()
 pint_util_logger.setLevel(logging.ERROR)
 registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
 configure_currency("EXC", "2005")
