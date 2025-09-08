@@ -19,10 +19,12 @@ __all__ = [
 
 # Package registry using definitions.txt
 registry = pint.UnitRegistry()
-logging.getLogger("pint.util").setLevel(logging.ERROR)
+pint_util_logger = logging.getLogger("pint.util")
+original_pint_uitl_log_level = pint_util_logger.getEffectiveLevel()
+pint_util_logger.setLevel(logging.ERROR)
 registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
 configure_currency("EXC", "2005")
-logging.getLogger("pint.util").setLevel(logging.WARNING)
+pint_util_logger.setLevel(original_pint_uitl_log_level)
 
 warn(
     'configure_currency("EXC", "2005") will no longer be the default in some future '
