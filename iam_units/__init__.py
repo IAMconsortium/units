@@ -9,8 +9,6 @@ from pint.util import to_units_container
 from . import emissions
 from .currency import configure_currency
 
-logging.getLogger("pint.util").setLevel(logging.ERROR)
-
 __all__ = [
     "convert_gwp",
     "configure_currency",
@@ -21,8 +19,10 @@ __all__ = [
 
 # Package registry using definitions.txt
 registry = pint.UnitRegistry()
+logging.getLogger("pint.util").setLevel(logging.ERROR)
 registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
-
+configure_currency("EXC", "2005")
+logging.getLogger("pint.util").setLevel(logging.WARNING)
 
 warn(
     'configure_currency("EXC", "2005") will no longer be the default in some future '
@@ -30,7 +30,6 @@ warn(
     "updated to call this function explicitly.",
     DeprecationWarning,
 )
-configure_currency("EXC", "2005")
 
 
 def convert_gwp(metric, quantity, *species):
