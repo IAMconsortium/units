@@ -25,7 +25,8 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Information Analysis",
 ]
-dependencies = ["pint >= 0.24.4", "typing_extensions; python_version >= '3.9'"]
+requires-python = ">= 3.9"
+dependencies = ["pint >= 0.24.4"]
 
 [project.urls]
 homepage = "https://github.com/IAMconsortium/units"

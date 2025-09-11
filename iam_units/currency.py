@@ -3,13 +3,8 @@
 See the inline comments (NB) for possible extensions of this code; also
 iam_units.update.currency.
 """
-from typing import Union
 
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal  # type: ignore [assignment]
-
+from typing import Literal, Union
 
 #: Exchange rate data for method=EXC, period=2005, from
 #: https://data.oecd.org/conversion/exchange-rates.htm
