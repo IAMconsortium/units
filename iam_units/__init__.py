@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from warnings import warn
 
@@ -18,8 +19,12 @@ __all__ = [
 
 # Package registry using definitions.txt
 registry = pint.UnitRegistry()
+pint_util_logger = logging.getLogger("pint.util")
+original_pint_util_log_level = pint_util_logger.getEffectiveLevel()
+pint_util_logger.setLevel(logging.ERROR)
 registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
-
+configure_currency("EXC", "2005")
+pint_util_logger.setLevel(original_pint_util_log_level)
 
 warn(
     'configure_currency("EXC", "2005") will no longer be the default in some future '
@@ -27,7 +32,6 @@ warn(
     "updated to call this function explicitly.",
     DeprecationWarning,
 )
-configure_currency("EXC", "2005")
 
 
 def convert_gwp(metric, quantity, *species):
