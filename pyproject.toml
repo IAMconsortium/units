@@ -33,7 +33,7 @@ homepage = "https://github.com/IAMconsortium/units"
 
 [project.optional-dependencies]
 update = ["globalwarmingpotentials"]
-tests = ["numpy", "pandas", "pytest", "pytest-cov"]
+tests = ["iam_units[update]", "numpy", "pandas", "pytest", "pytest-cov"]
 
 [tool.ruff.lint]
 mccabe.max-complexity = 7
