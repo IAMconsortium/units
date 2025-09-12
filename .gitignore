@@ -1,6 +1,7 @@
 # Python
 __pycache__
 .benchmarks
+.dmypy*
 .mypy_cache
 .pytest_cache
 .ruff_cache
