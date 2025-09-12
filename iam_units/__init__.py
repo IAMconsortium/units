@@ -17,13 +17,19 @@ __all__ = [
 ]
 
 
-# Package registry using definitions.txt
-registry = pint.UnitRegistry()
+# Use a registry cache
+registry = pint.UnitRegistry(cache_folder=":auto:")
+
 pint_util_logger = logging.getLogger("pint.util")
 original_pint_util_log_level = pint_util_logger.getEffectiveLevel()
 pint_util_logger.setLevel(logging.ERROR)
+
+# Load definitions.txt
 registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
+
 configure_currency("EXC", "2005")
+
+# Restore level of pint.util logger
 pint_util_logger.setLevel(original_pint_util_log_level)
 
 warn(
