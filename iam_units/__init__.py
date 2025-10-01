@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from warnings import warn
 
@@ -15,29 +16,6 @@ __all__ = [
     "format_mass",
     "registry",
 ]
-
-
-# Use a registry cache
-registry = pint.UnitRegistry(cache_folder=":auto:")
-
-pint_util_logger = logging.getLogger("pint.util")
-original_pint_util_log_level = pint_util_logger.getEffectiveLevel()
-pint_util_logger.setLevel(logging.ERROR)
-
-# Load definitions.txt
-registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
-
-configure_currency("EXC", "2005")
-
-# Restore level of pint.util logger
-pint_util_logger.setLevel(original_pint_util_log_level)
-
-warn(
-    'configure_currency("EXC", "2005") will no longer be the default in some future '
-    "version of iam-units. Code that relies on multiple-currency conversions should be "
-    "updated to call this function explicitly.",
-    DeprecationWarning,
-)
 
 
 def convert_gwp(metric, quantity, *species):
@@ -162,3 +140,40 @@ def format_mass(obj, info, spec=None):
         to_units_container(dict(units), registry=registry),
         spec.replace("~", "").lstrip(":"),
     )
+
+
+def _initialize() -> "pint.UnitRegistry":
+    from platformdirs import user_cache_path
+
+    # Identify cache folder: from environment variable, or default
+    cache_folder = os.environ.get("IAM_UNITS_CACHE", None) or user_cache_path(
+        "iam-units"
+    )
+
+    # Create the registry, using a disk cache
+    r = pint.UnitRegistry(cache_folder=cache_folder)
+
+    # Quiet the pint logger per redefinition of units
+    pint_util_logger = logging.getLogger("pint.util")
+    original_pint_util_log_level = pint_util_logger.getEffectiveLevel()
+    pint_util_logger.setLevel(logging.ERROR)
+
+    # Load definitions.txt
+    r.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
+
+    # Configure currency
+    warn(
+        'configure_currency("EXC", "2005") will no longer be the default in some future'
+        " version of iam-units. Code that relies on multiple-currency conversions "
+        " should be updated to call this function explicitly.",
+        DeprecationWarning,
+    )
+    configure_currency("EXC", "2005", _registry=r)
+
+    # Restore level of pint.util logger
+    pint_util_logger.setLevel(original_pint_util_log_level)
+
+    return r
+
+
+registry = _initialize()
