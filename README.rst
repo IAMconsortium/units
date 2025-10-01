@@ -10,7 +10,7 @@ Unit definitions for integrated-assessment research
    :target: https://github.com/IAMconsortium/units/actions/workflows/test.yaml
    :alt: Build status
 
-.. |coverage| image:: https://codecov.io/gh/IAMconsortium/units/graph/badge.svg?token=L0H171CF9O
+.. |coverage| image:: https://codecov.io/gh/IAMconsortium/units/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/IAMconsortium/units
    :alt: Test coverage
 
@@ -57,6 +57,26 @@ To make the registry from this package the default:
     # Now used by default for pint top-level classes and methods
     >>> pint.Quantity('1.2 tce')
     1.2 <Unit('tonne_of_coal_equivalent')>
+
+Environment variables
+---------------------
+
+The package responds to two optional environment variables:
+
+``IAM_UNITS_CACHE``
+   iam-units caches the created registry using `pint's caching mechanism`_.
+   If set, this variable must contain the path of a directory for the cache.
+   If not set, a default path is used.
+
+``IAM_UNITS_CURRENCY``
+   If set, this variable must be a string like "EXC,2005".
+   The two parts, separated by a comma (","), are separated
+   and passed as the *method* and *period* arguments to ``configure_currency()``
+   (see below)
+   when iam-units is imported.
+   If not set, the function is not called.
+
+.. _pint's caching mechanism: https://pint.readthedocs.io/en/stable/advanced/performance.html#speed-up-registry-instantiation
 
 Warnings
 ========
@@ -175,6 +195,8 @@ Currently ``iam_units`` only supports:
 - period-average exchange rates for annual periods (method="EXC");
 - period="2005"; and
 - the two currencies mentioned above.
+
+Up to v2025.9.12, ``configure_currency("EXC", 2005)`` was called automatically.
 
 Contributions that extend the supported currencies, methods, and periods are welcome.
 
