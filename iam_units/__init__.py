@@ -2,7 +2,6 @@ import logging
 import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, Union
-from warnings import warn
 
 import pint
 from pint.formatting import format_unit
@@ -176,14 +175,9 @@ def _initialize() -> "pint.UnitRegistry":
     # Load definitions.txt
     r.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
 
-    # Configure currency
-    warn(
-        'configure_currency("EXC", "2005") will no longer be the default in some future'
-        " version of iam-units. Code that relies on multiple-currency conversions "
-        " should be updated to call this function explicitly.",
-        DeprecationWarning,
-    )
-    configure_currency("EXC", "2005", _registry=r)
+    if value := os.environ.get("IAM_UNITS_CURRENCY", ""):
+        method, period = value.split(",")
+        configure_currency(method, period, _registry=r)  # type: ignore [arg-type]
 
     # Restore level of pint.util logger
     pint_util_logger.setLevel(original_pint_util_log_level)
