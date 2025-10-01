@@ -4,7 +4,10 @@ See the inline comments (NB) for possible extensions of this code; also
 iam_units.update.currency.
 """
 
-from typing import Literal, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
+
+if TYPE_CHECKING:
+    from pint import UnitRegistry
 
 #: Exchange rate data for method=EXC, period=2005, from
 #: https://data.oecd.org/conversion/exchange-rates.htm
@@ -18,7 +21,9 @@ DATA = {
 def configure_currency(
     method: Literal["EXC", "EXCE", "PPPGDP", "PPPPRC", "PPPP41"] = "EXC",
     period: Union[str, int] = 2005,
-):
+    *,
+    _registry: Optional["UnitRegistry"] = None,
+) -> None:
     """Configure currency conversions.
 
     Parameters
@@ -41,8 +46,10 @@ def configure_currency(
         For unsupported values of `method` or `period`. Currently, only the defaults are
         supported.
     """
-
-    from iam_units import registry
+    if _registry is None:
+        from iam_units import registry
+    else:
+        registry = _registry
 
     # Ensure string
     period = str(period)
