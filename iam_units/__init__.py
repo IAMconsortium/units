@@ -28,9 +28,9 @@ __all__ = [
 
 def convert_gwp(
     metric: Optional[str],
-    quantity: Union[str, "pint.Quantity", tuple[float, str]],
+    quantity: Union[str, pint.Quantity, tuple[float, str]],
     *species: str,
-) -> "pint.Quantity":
+) -> pint.Quantity:
     """Convert `quantity` between GHG `species` with a GWP `metric`.
 
     Parameters
@@ -116,7 +116,7 @@ def convert_gwp(
 
 
 def format_mass(
-    obj: Union["pint.Quantity", "pint.Unit"], info: str, spec: Optional[str] = None
+    obj: Union[pint.Quantity, pint.Unit], info: str, spec: Optional[str] = None
 ) -> str:
     """Format the units of `obj` with `info` inserted after its mass unit.
 
@@ -131,32 +131,31 @@ def format_mass(
     """
     spec = spec or registry.formatter.default_format
 
-    if hasattr(obj, "units"):
-        # Use only the units of a Quantity object
-        _obj = obj.units
-    else:
-        _obj = obj
+    # Use only the units of a Quantity object
+    obj_units = obj.units if isinstance(obj, pint.Quantity) else obj
 
     # Use the symbol if the modifier "~" is in `spec`; else the canonical name. cf.
     # pint.Unit.__format__()
     method = registry._get_symbol if "~" in spec else lambda k: k
-    # Collect the pieces of the unit expression
-    units: list[tuple[str, "Scalar"]] = [(method(k), v) for k, v in obj._units.items()]
+    # Collect the pieces of the unit expression: tuples of (unit string, exponent)
+    unit_power: list[tuple[str, "Scalar"]] = [
+        (method(unit), power) for unit, power in obj_units._units.items()
+    ]
 
     # Index of the mass component
-    mass_index = list(obj.dimensionality.keys()).index("[mass]")
+    index = list(obj_units.dimensionality.keys()).index("[mass]")
     # Append the information (e.g. species) to the mass component
-    units[mass_index] = (f"{units[mass_index][0]} {info}", units[mass_index][1])
+    unit_power[index] = (f"{unit_power[index][0]} {info}", unit_power[index][1])
 
     # Prepare pint.util.UnitsContainer and hand off to pint's formatting. Discard "~"
     # (used above) and ":" (invalid in pint ≥0.18).
     return format_unit(
-        to_units_container(dict(units), registry=registry),
+        to_units_container(dict(unit_power), registry=registry),
         spec.replace("~", "").lstrip(":"),
     )
 
 
-def _initialize() -> "pint.UnitRegistry":
+def _initialize() -> pint.UnitRegistry:
     from platformdirs import user_cache_path
 
     # Identify cache folder: from environment variable, or default
@@ -165,7 +164,7 @@ def _initialize() -> "pint.UnitRegistry":
     )
 
     # Create the registry, using a disk cache
-    r = pint.UnitRegistry(cache_folder=cache_folder)
+    registry = pint.UnitRegistry(cache_folder=cache_folder)
 
     # Quiet the pint logger per redefinition of units
     pint_util_logger = logging.getLogger("pint.util")
@@ -173,16 +172,16 @@ def _initialize() -> "pint.UnitRegistry":
     pint_util_logger.setLevel(logging.ERROR)
 
     # Load definitions.txt
-    r.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
+    registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
 
     if value := os.environ.get("IAM_UNITS_CURRENCY", ""):
         method, period = value.split(",")
-        configure_currency(method, period, _registry=r)  # type: ignore [arg-type]
+        configure_currency(method, period, _registry=registry)  # type: ignore [arg-type]
 
     # Restore level of pint.util logger
     pint_util_logger.setLevel(original_pint_util_log_level)
 
-    return r
+    return registry
 
 
 registry = _initialize()
