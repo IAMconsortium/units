@@ -34,7 +34,7 @@ PARAMS = [
 @pytest.mark.parametrize(
     "unit_str, dim, new_def", PARAMS, ids=lambda v: v if isinstance(v, str) else ""
 )
-def test_units(unit_str, dim, new_def):
+def test_units(unit_str, dim, new_def) -> None:
     if new_def:
         # Units defined in dimensions.txt are not recognized by base pint
         with pytest.raises(pint.UndefinedUnitError):
@@ -47,12 +47,12 @@ def test_units(unit_str, dim, new_def):
     assert registry("1 " + unit_str).dimensionality == dim
 
 
-def test_orders_of_magnitude():
+def test_orders_of_magnitude() -> None:
     # The registry recognizes units prefixed by an order of magnitude
     assert registry("1.2 billion EUR").to("million EUR").magnitude == 1.2e3
 
 
-def test_kt():
+def test_kt() -> None:
     # The registry should correctly interpret `kt` as a weight (not velocity)
     assert str(registry("1000 kt").to("Mt")) == "1.0 megametric_ton"
 
@@ -61,20 +61,20 @@ def test_kt():
         pint.UnitRegistry()("kt").to("Mt")
 
 
-def test_currency():
+def test_currency() -> None:
     with pytest.raises(NotImplementedError):
         configure_currency("PPPGDP", 2010)
 
 
-def test_emissions_gwp_versions():
+def test_emissions_gwp_versions() -> None:
     assert isinstance(emissions.GWP_VERSION, str)
 
 
-def test_emissions_metrics():
+def test_emissions_metrics() -> None:
     assert "SARGWP100" in emissions.METRICS
 
 
-def test_emissions_internal():
+def test_emissions_internal() -> None:
     # Dummy units can be created
     registry("0.5 _gwp").dimensionality == {"[_GWP]": 1.0}
 
@@ -114,32 +114,34 @@ def test_emissions_internal():
         ("AR5GWP100", "HFC143a", "CO2", 4800.0),
     ],
 )
-def test_convert_gwp(units, metric, species_in, species_out, expected_value):
+def test_convert_gwp(
+    units: str, metric, species_in, species_out, expected_value
+) -> None:
     # Bare masses can be converted
-    qty = registry.Quantity(1.0, units.format(""))
+    qty0 = registry.Quantity(1.0, units.format(""))
     expected = registry(f"{expected_value} {units}")
 
-    observed = convert_gwp(metric, qty, species_in, species_out)
+    observed = convert_gwp(metric, qty0, species_in, species_out)
     assert observed.units == expected.units
     np.testing.assert_almost_equal(observed.magnitude, expected.magnitude)
 
     # '[mass] [speciesname] (/ [time])' can be converted; the input species is extracted
     # from the *qty* argument
-    qty = "1.0 " + units.format(species_in)
+    qty1 = "1.0 " + units.format(species_in)
     expected = registry(f"{expected_value} {units}")
 
-    observed = convert_gwp(metric, qty, species_out)
+    observed = convert_gwp(metric, qty1, species_out)
     assert observed.units == expected.units
     np.testing.assert_almost_equal(observed.magnitude, expected.magnitude)
 
     # Tuple of (vector magnitude, unit expression) can be converted where the
     # the unit expression contains the input species name
     arr = np.array([1.0, 2.5, 0.1])
-    qty = (arr, units.format(species_in))
+    qty2 = (arr, units.format(species_in))
     expected = arr * expected_value
 
     # Conversion works
-    result = convert_gwp(metric, qty, species_out)
+    result = convert_gwp(metric, qty2, species_out)
     # Magnitudes are as expected
     assert_array_almost_equal(result.magnitude, expected)
 
@@ -148,7 +150,7 @@ def test_convert_gwp(units, metric, species_in, species_out, expected_value):
     "context",
     ["AR5GWP100", None],
 )
-def test_convert_gwp_carbon(context):
+def test_convert_gwp_carbon(context) -> None:
     # CO2 can be converted to C
     qty = (44.0 / 12, "tonne CO2")
     result = convert_gwp(context, qty, "C")
@@ -175,17 +177,17 @@ def test_convert_gwp_carbon(context):
         ("gram / a", "CO₂-e (AR4)", ":~", "g CO₂-e (AR4) / a"),
     ],
 )
-def test_format_mass(units_in, species_str, spec, output):
+def test_format_mass(units_in, species_str, spec, output) -> None:
     # Quantity object can be formatted
-    qty = registry.Quantity(3.5, units_in)
-    assert format_mass(qty, species_str, spec) == output
+    qty0 = registry.Quantity(3.5, units_in)
+    assert format_mass(qty0, species_str, spec) == output
 
     # Unit object can be formatted
-    qty = registry.Unit(units_in)
-    assert format_mass(qty, species_str, spec) == output
+    qty1 = registry.Unit(units_in)
+    assert format_mass(qty1, species_str, spec) == output
 
 
-def test_import_warnings(caplog):
+def test_import_warnings(caplog) -> None:
     import iam_units
 
     importlib.reload(iam_units)
