@@ -15,11 +15,9 @@ jobs:
     strategy:
       matrix:
         pint-version: ["==0.24.4", ""]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
         exclude:
         # latest version of pint requires minimum 3.11
-        - pint-version: ""
-          python-version: "3.9"
         - pint-version: ""
           python-version: "3.10"
 
@@ -64,7 +62,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - uses: astral-sh/setup-uv@v7
-      with: { enable-cache: true, python-version: "3.13" }
+      with: { enable-cache: true, python-version: "3.14" }
     - name: Clear and re-create the pre-commit environments
       run: uvx pre-commit clean
       if: github.event_name == 'schedule'  # Comment this line to force clear
