@@ -1,7 +1,8 @@
 import logging
 import os
+from collections.abc import Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 import pint
 from pint.formatting import format_unit
@@ -15,8 +16,9 @@ if TYPE_CHECKING:
     from fractions import Fraction
 
     import numpy as np
+    from numpy.typing import NDArray
 
-    Scalar = Union[float, int, Decimal, Fraction, np.number[Any]]
+    Scalar = float | int | Decimal | Fraction | np.number[Any]
 
 __all__ = [
     "convert_gwp",
@@ -27,9 +29,9 @@ __all__ = [
 
 
 def convert_gwp(
-    metric: Optional[str],
-    quantity: Union[str, pint.Quantity, tuple[float, str]],
-    *species: str,
+    metric: str | None,
+    quantity: str | pint.Quantity | tuple["Scalar | Sequence[Scalar] | NDArray", str],
+    *species: str | None,
 ) -> pint.Quantity:
     """Convert `quantity` between GHG `species` with a GWP `metric`.
 
@@ -70,25 +72,25 @@ def convert_gwp(
 
     # Split `quantity` if it is a tuple. After this step:
     # - `mag` is the magnitude, or None.
-    # - `expr` is a string expression for either just the units, or the entire
-    #   quantity, including magnitude, as a str or pint.Quantity.
+    # - `expr` is a string expression for either just the units, or the entire quantity,
+    #   including magnitude, as a str or pint.Quantity.
     mag, expr = quantity if isinstance(quantity, tuple) else (None, quantity)
 
     # If species_in wasn't provided, then `expr` must contain it
     if not species_in:
-        # Extract it using the regex, then re-assemble the expression for the
-        # units or whole quantity
+        # Extract it using the regex, then re-assemble the expression for the units or
+        # whole quantity
         q0, species_in, q1 = emissions.pattern.split(str(expr), maxsplit=1)
         expr = q0 + q1
 
-    # `metric` can only be None if the input and output species symbols are
-    # identical or equivalent
+    # `metric` can only be None if the input and output species symbols are identical or
+    # equivalent
     if metric is None:
         if species_in == species_out or any(
             {species_in, species_out} <= g for g in emissions.EQUIV
         ):
             metric = "AR5GWP100"
-        elif species_in in species_out:
+        elif species_out and species_in in species_out:
             # Eg. 'CO2' in 'CO2 / a'. This is both a DimensionalityError and a
             # ValueError (no metric); raise the former for pyam compat
             raise pint.DimensionalityError(species_in, species_out)
@@ -116,7 +118,7 @@ def convert_gwp(
 
 
 def format_mass(
-    obj: Union[pint.Quantity, pint.Unit], info: str, spec: Optional[str] = None
+    obj: pint.Quantity | pint.Unit, info: str, spec: str | None = None
 ) -> str:
     """Format the units of `obj` with `info` inserted after its mass unit.
 

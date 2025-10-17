@@ -4,7 +4,7 @@ See the inline comments (NB) for possible extensions of this code; also
 iam_units.update.currency.
 """
 
-from typing import TYPE_CHECKING, Literal, Optional, Union
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from pint import UnitRegistry
@@ -20,9 +20,9 @@ DATA = {
 
 def configure_currency(
     method: Literal["EXC", "EXCE", "PPPGDP", "PPPPRC", "PPPP41"] = "EXC",
-    period: Union[str, int] = 2005,
+    period: str | int = 2005,
     *,
-    _registry: Optional["UnitRegistry"] = None,
+    _registry: "UnitRegistry | None" = None,
 ) -> None:
     """Configure currency conversions.
 

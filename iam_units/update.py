@@ -92,7 +92,7 @@ _EMI_EQUIV = {
 }
 
 
-def currency():
+def currency() -> None:
     """Update currency definitions files."""
     # Currently no such files exist; see iam_units.currency.configure_currency().
     #
@@ -106,7 +106,7 @@ def currency():
     raise NotImplementedError
 
 
-def emissions():
+def emissions() -> None:
     """Update emissions definitions files."""
     data_path = DATA_PATH / "emissions"
 
