@@ -86,6 +86,7 @@ _EMI_EQUIV = {
         "CO2_eq": None,
         "CO2e": None,
         "CO2eq": None,
+        "CO2-eq": None,
         "C": "44. / 12 * ",
         "Ce": "44. / 12 * ",
     }
