@@ -141,7 +141,8 @@ def format_mass(
     method = registry._get_symbol if "~" in spec else lambda k: k
     # Collect the pieces of the unit expression: tuples of (unit string, exponent)
     unit_power: list[tuple[str, "Scalar"]] = [
-        (method(unit), power) for unit, power in obj_units._units.items()
+        (method(unit), power)
+        for unit, power in obj_units._units.items()  # type: ignore
     ]
 
     # Index of the mass component
@@ -166,7 +167,7 @@ def _initialize() -> pint.UnitRegistry:
     )
 
     # Create the registry, using a disk cache
-    registry = pint.UnitRegistry(cache_folder=cache_folder)
+    registry: pint.UnitRegistry = pint.UnitRegistry(cache_folder=cache_folder)
 
     # Quiet the pint logger per redefinition of units
     pint_util_logger = logging.getLogger("pint.util")
