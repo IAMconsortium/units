@@ -103,7 +103,7 @@ def convert_gwp(
     # - If a str, use the 1-arg form to parse it.
     # - If already a pint.Quantity, this is a no-op.
     args = (expr,) if mag is None else (mag, expr)
-    quantity = registry.Quantity(*args)
+    quantity = registry.Quantity(*args)  # type: ignore
 
     # Construct intermediate units with the same dimensionality as `quantity`, except
     # '[mass]' replaced with the dummy unit '_gwp'

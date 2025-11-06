@@ -2,7 +2,7 @@ import importlib
 
 import numpy as np
 import pint
-import pytest
+import pytest  # type: ignore
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from pint.util import UnitsContainer
 
