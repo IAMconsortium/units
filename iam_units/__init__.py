@@ -112,7 +112,7 @@ def convert_gwp(
 
     # Convert to dummy units using 'a' for the input species; then back to the input
     # units using 'a' for the output species.
-    return quantity.to(dummy, metric, _a=f"a_{species_in}").to(
+    return quantity.to(dummy, metric, _a=f"a_{species_in}").to(  # type: ignore
         quantity.units, metric, _a=f"a_{species_out}"
     )
 
