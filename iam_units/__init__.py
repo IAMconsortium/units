@@ -173,7 +173,7 @@ def _initialize() -> pint.UnitRegistry:
 
     if value := os.environ.get("IAM_UNITS_CURRENCY", ""):
         method, period = value.split(",")
-        configure_currency(method, period, _registry=registry)  # type: ignore [arg-type]
+        configure_currency(method, period, _registry=registry)
 
     # Restore level of pint.util logger
     pint_util_logger.setLevel(original_pint_util_log_level)
