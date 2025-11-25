@@ -35,6 +35,14 @@ homepage = "https://github.com/IAMconsortium/units"
 update = ["globalwarmingpotentials"]
 tests = ["iam_units[update]", "numpy", "pandas", "pytest", "pytest-cov"]
 
+[tool.mypy]
+files = ["iam_units"]
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["globalwarmingpotentials"]
+ignore_missing_imports = true
+
 [tool.ruff.lint]
 mccabe.max-complexity = 7
 select = ["C9", "E", "F", "I", "W"]

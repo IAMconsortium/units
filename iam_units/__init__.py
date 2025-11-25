@@ -2,7 +2,7 @@ import logging
 import os
 from collections.abc import Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pint
 from pint.formatting import format_unit
@@ -12,13 +12,8 @@ from . import emissions
 from .currency import configure_currency
 
 if TYPE_CHECKING:
-    from decimal import Decimal
-    from fractions import Fraction
-
-    import numpy as np
     from numpy.typing import NDArray
-
-    Scalar = float | int | Decimal | Fraction | np.number[Any]
+    from pint._typing import Scalar
 
 __all__ = [
     "convert_gwp",
@@ -103,7 +98,7 @@ def convert_gwp(
     # - If a str, use the 1-arg form to parse it.
     # - If already a pint.Quantity, this is a no-op.
     args = (expr,) if mag is None else (mag, expr)
-    quantity = registry.Quantity(*args)  # type: ignore
+    quantity = registry.Quantity(*args)
 
     # Construct intermediate units with the same dimensionality as `quantity`, except
     # '[mass]' replaced with the dummy unit '_gwp'
@@ -112,7 +107,7 @@ def convert_gwp(
 
     # Convert to dummy units using 'a' for the input species; then back to the input
     # units using 'a' for the output species.
-    return quantity.to(dummy, metric, _a=f"a_{species_in}").to(  # type: ignore
+    return quantity.to(dummy, metric, _a=f"a_{species_in}").to(
         quantity.units, metric, _a=f"a_{species_out}"
     )
 
@@ -141,8 +136,7 @@ def format_mass(
     method = registry._get_symbol if "~" in spec else lambda k: k
     # Collect the pieces of the unit expression: tuples of (unit string, exponent)
     unit_power: list[tuple[str, "Scalar"]] = [
-        (method(unit), power)
-        for unit, power in obj_units._units.items()  # type: ignore
+        (method(unit), power) for unit, power in obj_units._units.items()
     ]
 
     # Index of the mass component
