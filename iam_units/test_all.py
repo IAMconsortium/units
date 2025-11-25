@@ -7,8 +7,11 @@ from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from pint.util import UnitsContainer
 
 from iam_units import configure_currency, convert_gwp, emissions, format_mass, registry
+from iam_units.currency import METHOD
 
 DEFAULTS = pint.get_application_registry()
+
+NIE = pytest.mark.xfail(raises=NotImplementedError)
 
 # Parameters for test_units(), tuple of:
 # 1. A literal string to be parsed as a unit.
@@ -61,9 +64,21 @@ def test_kt() -> None:
         pint.UnitRegistry()("kt").to("Mt")
 
 
-def test_currency() -> None:
-    with pytest.raises(NotImplementedError):
-        configure_currency("PPPGDP", 2010)
+@pytest.mark.parametrize(
+    "method, period",
+    (
+        # Not supported method
+        pytest.param("PPPGDP", 2005, marks=NIE),
+        pytest.param(METHOD.PPPGDP, 2005, marks=NIE),
+        # Not supported period
+        pytest.param("EXC", 2010, marks=NIE),
+        pytest.param(METHOD.EXC, 2010, marks=NIE),
+        # Invalid method str
+        pytest.param("FOO", 2005, marks=pytest.mark.xfail(raises=ValueError)),
+    ),
+)
+def test_currency(method: METHOD | str, period: int) -> None:
+    configure_currency(method, period)
 
 
 def test_emissions_gwp_versions() -> None:

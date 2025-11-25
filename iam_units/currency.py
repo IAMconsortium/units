@@ -4,7 +4,8 @@ See the inline comments (NB) for possible extensions of this code; also
 iam_units.update.currency.
 """
 
-from typing import TYPE_CHECKING, Literal
+from enum import Enum, auto
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pint import UnitRegistry
@@ -18,8 +19,27 @@ DATA = {
 }
 
 
+class METHOD(Enum):
+    """Method of computing exchange rate data.
+
+    From the code list OECD:CL_SNA_TABLE4_TRANSACT. The docstrings here are from their
+    English-language descriptions.
+    """
+
+    #: Exchange rates, period-average
+    EXC = auto()
+    #: Exchange rates, end of period.
+    EXCE = auto()
+    #: Purchasing Power Parities for GDP.
+    PPPGDP = auto()
+    #: Purchasing Power Parities for private consumption.
+    PPPPRC = auto()
+    #: Purchasing Power Parities for actual individual consumption.
+    PPPP41 = auto()
+
+
 def configure_currency(
-    method: Literal["EXC", "EXCE", "PPPGDP", "PPPPRC", "PPPP41"] = "EXC",
+    method: METHOD | str = METHOD.EXC,
     period: str | int = 2005,
     *,
     _registry: "UnitRegistry | None" = None,
@@ -28,15 +48,8 @@ def configure_currency(
 
     Parameters
     ----------
-    method : str
-        Method of computing exchange rate data. The accepted values are from the code
-        list OECD:CL_SNA_TABLE4_TRANSACT; given here with their English descriptions.
-
-        - `EXC`: Exchange rates, period-average
-        - `EXCE`: Exchange rates, end of period
-        - `PPPGDP`: Purchasing Power Parities for GDP
-        - `PPPPRC`: Purchasing Power Parities for private consumption
-        - `PPPP41`: Purchasing Power Parities for actual individual consumption
+    method : METHOD or str
+        Method of computing exchange rate data.
     period : int or str
         Time period (e.g. year) for exchange rates.
 
@@ -51,18 +64,24 @@ def configure_currency(
     else:
         registry = _registry
 
+    # Ensure instance of METHOD
+    try:
+        method = METHOD[method] if isinstance(method, str) else method
+    except KeyError:
+        raise ValueError(f"method={method}; expected one of {[m.name for m in METHOD]}")
+
     # Ensure string
     period = str(period)
 
     # Select data for (method, period)
-    if method == "EXC" and period == "2005":
+    if method is METHOD.EXC and period == "2005":
         # NB this code could be extended to:
         # - Load data for other combinations of (method, period).
         # - Load from file, instead of copying from values embedded in code.
         data = DATA.copy()
     else:
         message = []
-        if method != "EXC":
+        if method is not METHOD.EXC:
             message.append(f"method={method!r}")
         if period != "2005":
             message.append(f"period={period}")

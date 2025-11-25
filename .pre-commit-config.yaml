@@ -3,11 +3,11 @@ repos:
   rev: v1.18.1
   hooks:
   - id: mypy
+    pass_filenames: false
     additional_dependencies:
     - numpy
     - pint
     - pytest
-    args: []
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.13.0
   hooks:

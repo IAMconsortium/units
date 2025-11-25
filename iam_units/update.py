@@ -3,7 +3,7 @@ from itertools import chain
 from pathlib import Path
 
 # This package is only required when updating the emissions GWP conversion factors
-import globalwarmingpotentials as gwp  # type: ignore
+import globalwarmingpotentials as gwp
 
 # Base path for package code
 BASE_PATH = Path(__file__).parent

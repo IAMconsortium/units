@@ -2,7 +2,7 @@ import logging
 import os
 from collections.abc import Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pint
 from pint.formatting import format_unit
@@ -12,13 +12,8 @@ from . import emissions
 from .currency import configure_currency
 
 if TYPE_CHECKING:
-    from decimal import Decimal
-    from fractions import Fraction
-
-    import numpy as np
     from numpy.typing import NDArray
-
-    Scalar = float | int | Decimal | Fraction | np.number[Any]
+    from pint._typing import Scalar
 
 __all__ = [
     "convert_gwp",
@@ -166,7 +161,7 @@ def _initialize() -> pint.UnitRegistry:
     )
 
     # Create the registry, using a disk cache
-    registry = pint.UnitRegistry(cache_folder=cache_folder)
+    registry: pint.UnitRegistry = pint.UnitRegistry(cache_folder=cache_folder)
 
     # Quiet the pint logger per redefinition of units
     pint_util_logger = logging.getLogger("pint.util")
@@ -178,7 +173,7 @@ def _initialize() -> pint.UnitRegistry:
 
     if value := os.environ.get("IAM_UNITS_CURRENCY", ""):
         method, period = value.split(",")
-        configure_currency(method, period, _registry=registry)  # type: ignore [arg-type]
+        configure_currency(method, period, _registry=registry)
 
     # Restore level of pint.util logger
     pint_util_logger.setLevel(original_pint_util_log_level)
