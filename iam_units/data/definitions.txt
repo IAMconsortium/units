@@ -46,13 +46,17 @@ quadrillion = 1e15
 
 USD_2005 = [currency] = USD
 
-# Based on Germany's GDP deflator, data from
-# https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=DE
+# Based on the deflator for the Euro zone, data from
+# https://data.worldbank.org/indicator/NY.GDP.DEFL.KD.ZG?locations=XC
+# Factor calculated by taking the product of annual values in %, so for 
+# example EUR_2007 = (1 - (V_2007/100)) * (1 - (V_2006/100)) * EUR_2005 
+# last update: 2026-03-10
 
 EUR_2005 = [currency_EUR] = EUR
-EUR_2000 = 1.0564 * EUR_2005
-EUR_2010 = 0.9463 * EUR_2005
-EUR_2020 = 0.8017 * EUR_2005
+EUR_2000 = 1.166531 * EUR_2005
+EUR_2010 = 0.901141 * EUR_2005
+EUR_2020 = 0.785147 * EUR_2005
+EUR_2024 = 0.647739 * EUR_2005
 
 # United States' GDP deflator, data from
 # https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US
