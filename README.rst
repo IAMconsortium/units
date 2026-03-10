@@ -14,7 +14,7 @@ Unit definitions for integrated-assessment research
    :target: https://codecov.io/gh/IAMconsortium/units
    :alt: Test coverage
 
-© 2020-2025 `IAM-units authors`_; licensed under the `GNU GPL version 3`_.
+© 2020-2026 `IAM-units authors`_; licensed under the `GNU GPL version 3`_.
 
 The file `definitions.txt`_ gives `Pint`_-compatible definitions of energy, climate, and related units to supplement the SI and other units included in Pint's `default_en.txt`_.
 These definitions are used by:
@@ -172,9 +172,10 @@ Currency
 ``iam_units`` defines deflators for:
 
 - USD (United States dollar) for annual periods from 2000 to 2022 inclusive.
-- EUR (Euro) for the periods 2005, 2010, 2015, and 2020 only.
+- EUR (Euro) for the periods 2005, 2010, 2015, 2020, and 2024 only.
 
-These can be used via pint-compatible unit expressions like ``USD_2019`` that combine the `ISO 4217`_ alphabetic code with the period.
+These can be used via pint-compatible unit expressions like ``USD_2019``
+that combine the `ISO 4217`_ alphabetic code with the time period.
 
 To enable conversions between *different* currencies, use the function ``configure_currency()``:
 
