@@ -50,6 +50,7 @@ USD_2005 = [currency] = USD
 # https://data.worldbank.org/indicator/NY.GDP.DEFL.KD.ZG?locations=XC
 # Factor calculated by taking the product of annual values in %, so for 
 # exmple EUR_2007 = (1 - (V_2007/100)) * (1 - (V_2007/100)) * EUR_2005 
+# last update: 2026-03-10
 
 EUR_2005 = [currency_EUR] = EUR
 EUR_2000 = 1.166531 * EUR_2005
