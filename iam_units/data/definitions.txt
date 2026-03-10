@@ -49,7 +49,7 @@ USD_2005 = [currency] = USD
 # Based on the deflator for the Euro zone, data from
 # https://data.worldbank.org/indicator/NY.GDP.DEFL.KD.ZG?locations=XC
 # Factor calculated by taking the product of annual values in %, so for 
-# exmple EUR_2007 = (1 - (V_2007/100)) * (1 - (V_2007/100)) * EUR_2005 
+# example EUR_2007 = (1 - (V_2007/100)) * (1 - (V_2006/100)) * EUR_2005 
 # last update: 2026-03-10
 
 EUR_2005 = [currency_EUR] = EUR
