@@ -47,8 +47,7 @@ def configure_currency(
     Raises
     ------
     NotImplementedError
-        For unsupported values of `method` or `period`. Currently, only the defaults are
-        supported.
+        For unsupported values of `method` or `period`.
     """
     if _registry is None:
         from iam_units import registry

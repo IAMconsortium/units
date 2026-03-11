@@ -97,6 +97,9 @@ _EMI_EQUIV = {
 }
 
 _CURRENCY_PERIODS = ("2005", "2010", "2015", "2020", "2024")
+# OECD Table 4 supplies the primary source for all currently supported methods.
+# Cross-source validation against World Bank overlap is deferred to a follow-up
+# PR because the WDI SDMX metadata/dataflow path was unreliable in live tests.
 # DEU is used as the representative EUR-area series. For exchange rates this is
 # equivalent to any euro-area member because the national currency is EUR. For PPP
 # methods, the choice is specific to Germany and should remain documented.
@@ -110,6 +113,9 @@ _TRANSACTION_BY_METHOD = {
 }
 _CURRENCY_QUERY = {
     "FREQ": "A",
+    # These dimensions are invariant for the five Table 4 transactions used here:
+    # annual frequency, total economy vs total economy, currency-to-USD quotes,
+    # and the canonical national-accounts table transformation.
     "SECTOR": "S1",
     "COUNTERPART_SECTOR": "S1",
     "INSTR_ASSET": "F21",
@@ -130,23 +136,8 @@ def currency() -> None:
 
     for method in _TRANSACTION_BY_METHOD:
         for period in _CURRENCY_PERIODS:
-            rows = list(_fetch_currency_rows(method=method, period=period))
+            rows = list(_fetch_currency_rows_oecd()[method, period])
             _write_currency_file(data_path / f"{method}-{period}.txt", rows)
-
-
-def _fetch_currency_rows(
-    method: str, period: str
-) -> "Iterable[tuple[str, str, float]]":
-    return _fetch_currency_rows_sdmx(method=method, period=period)
-
-
-def _fetch_currency_rows_sdmx(
-    method: str, period: str
-) -> "Iterable[tuple[str, str, float]]":
-    if method not in _TRANSACTION_BY_METHOD:
-        raise ValueError(f"Unsupported method={method!r}")
-
-    return _fetch_currency_rows_oecd()[method, period]
 
 
 @cache
@@ -199,7 +190,7 @@ def _write_currency_file(path: Path, rows: "Iterable[tuple[str, str, float]]") -
         "# representative_area[EUR]=DEU",
         "# DO NOT ALTER THIS FILE MANUALLY!",
     ]
-    lines.extend(f"{currency} {period} {value}" for currency, period, value in rows)
+    lines.extend(f"{currency} {period} {value:.6f}" for currency, period, value in rows)
     path.write_text("\n".join(lines) + "\n")
 
 
