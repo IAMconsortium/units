@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from pint import UnitRegistry
 
 DATA_PATH = Path(__file__).with_name("data") / "currency"
+CONFIGURED_CURRENCY_ATTR = "_iam_units_configured_currency_methods"
 
 
 class METHOD(Enum):
@@ -35,7 +36,7 @@ def configure_currency(
     *,
     _registry: "UnitRegistry | None" = None,
 ) -> None:
-    """Configure currency conversions.
+    """Configure currency conversions on a registry.
 
     Parameters
     ----------
@@ -43,6 +44,12 @@ def configure_currency(
         Method of computing exchange rate data.
     period : int or str
         Time period (e.g. year) for exchange rates.
+
+    Notes
+    -----
+    Currency units can only be configured once per ``(currency, period)`` pair and
+    method on a given registry. Repeated calls with the same method are a no-op; a
+    different method for an already configured pair raises ``ValueError``.
 
     Raises
     ------
@@ -64,10 +71,35 @@ def configure_currency(
     period = str(period)
 
     data = _load_currency_data(method, period)
+    configured = dict(getattr(registry, CONFIGURED_CURRENCY_ATTR, {}))
+    conflicts = [
+        (other, file_period, configured[(other, file_period)])
+        for other, file_period in data
+        if configured.get((other, file_period), method) is not method
+    ]
+
+    if conflicts:
+        unit_list = ", ".join(
+            sorted(
+                (
+                    f"{other}_{file_period} "
+                    f"(already configured with {configured_method.name})"
+                )
+                for other, file_period, configured_method in conflicts
+            )
+        )
+        raise ValueError(
+            f"Currency unit(s) already defined on this registry: {unit_list}. "
+            "configure_currency() cannot switch methods for an existing "
+            "(currency, period) pair."
+        )
 
     # Insert definitions
     for (other, period), value in data.items():
         registry.define(f"{other}_{period} = USD_{period} / {value} = {other}")
+
+    configured.update({key: method for key in data})
+    setattr(registry, CONFIGURED_CURRENCY_ATTR, configured)
 
 
 def _load_currency_data(method: METHOD, period: str) -> dict[tuple[str, str], float]:

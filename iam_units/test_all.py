@@ -108,6 +108,32 @@ def test_currency_pppgdp_data_file() -> None:
     assert converted.magnitude == pytest.approx(28.25337281882418)
 
 
+def test_currency_rejects_redefinition_with_different_method() -> None:
+    local_registry = _fresh_registry()
+    configure_currency("EXC", 2005, _registry=local_registry)
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"Currency unit\(s\) already defined on this registry: "
+            r"EUR_2005 \(already configured with EXC\)"
+        ),
+    ):
+        configure_currency("PPPGDP", 2005, _registry=local_registry)
+
+    converted = local_registry("42.1 USD_2020").to("EUR_2005")
+    assert converted.magnitude == pytest.approx(26.022132012144635)
+
+
+def test_currency_allows_idempotent_redefinition_with_same_method() -> None:
+    local_registry = _fresh_registry()
+    configure_currency("EXC", 2005, _registry=local_registry)
+    configure_currency("EXC", 2005, _registry=local_registry)
+
+    converted = local_registry("42.1 USD_2020").to("EUR_2005")
+    assert converted.magnitude == pytest.approx(26.022132012144635)
+
+
 def test_write_currency_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("iam_units.currency.DATA_PATH", tmp_path)
     _write_currency_file(
