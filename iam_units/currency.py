@@ -1,22 +1,13 @@
-"""Currency conversions.
-
-See the inline comments (NB) for possible extensions of this code; also
-iam_units.update.currency.
-"""
+"""Currency conversions."""
 
 from enum import Enum, auto
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pint import UnitRegistry
 
-#: Exchange rate data for method=EXC, period=2005, from
-#: https://data.oecd.org/conversion/exchange-rates.htm
-#:
-#: NB this data could be extended to cover other currencies.
-DATA = {
-    ("EUR", "2005"): 0.8038,
-}
+DATA_PATH = Path(__file__).with_name("data") / "currency"
 
 
 class METHOD(Enum):
@@ -73,13 +64,17 @@ def configure_currency(
     # Ensure string
     period = str(period)
 
-    # Select data for (method, period)
-    if method is METHOD.EXC and period == "2005":
-        # NB this code could be extended to:
-        # - Load data for other combinations of (method, period).
-        # - Load from file, instead of copying from values embedded in code.
-        data = DATA.copy()
-    else:
+    data = _load_currency_data(method, period)
+
+    # Insert definitions
+    for (other, period), value in data.items():
+        registry.define(f"{other}_{period} = USD_{period} / {value} = {other}")
+
+
+def _load_currency_data(method: METHOD, period: str) -> dict[tuple[str, str], float]:
+    path = DATA_PATH / f"{method.name}-{period}.txt"
+
+    if not path.exists():
         message = []
         if method is not METHOD.EXC:
             message.append(f"method={method!r}")
@@ -87,6 +82,16 @@ def configure_currency(
             message.append(f"period={period}")
         raise NotImplementedError(", ".join(message))
 
-    # Insert definitions
-    for (other, period), value in data.items():
-        registry.define(f"{other}_{period} = USD_{period} / {value} = {other}")
+    result: dict[tuple[str, str], float] = {}
+    for raw_line in path.read_text().splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+
+        other, file_period, value = line.split()
+        result[(other, file_period)] = float(value)
+
+    if not result:
+        raise ValueError(f"No currency data found in {path}")
+
+    return result

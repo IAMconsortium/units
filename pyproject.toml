@@ -32,7 +32,7 @@ dependencies = ["pint >= 0.24.4"]
 homepage = "https://github.com/IAMconsortium/units"
 
 [project.optional-dependencies]
-update = ["globalwarmingpotentials"]
+update = ["globalwarmingpotentials", "sdmx1"]
 tests = ["iam_units[update]", "numpy", "pandas", "pytest", "pytest-cov"]
 
 [tool.mypy]

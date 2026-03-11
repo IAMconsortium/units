@@ -1,4 +1,5 @@
 import importlib
+from pathlib import Path
 
 import numpy as np
 import pint
@@ -8,10 +9,20 @@ from pint.util import UnitsContainer
 
 from iam_units import configure_currency, convert_gwp, emissions, format_mass, registry
 from iam_units.currency import METHOD
+from iam_units.update import _write_currency_file
 
 DEFAULTS = pint.get_application_registry()
 
 NIE = pytest.mark.xfail(raises=NotImplementedError)
+
+
+def _fresh_registry() -> pint.UnitRegistry:
+    loaded_registry: pint.UnitRegistry = pint.UnitRegistry()
+    loaded_registry.load_definitions(
+        str(Path(__file__).parent / "data" / "definitions.txt")
+    )
+    return loaded_registry
+
 
 # Parameters for test_units(), tuple of:
 # 1. A literal string to be parsed as a unit.
@@ -67,18 +78,46 @@ def test_kt() -> None:
 @pytest.mark.parametrize(
     "method, period",
     (
-        # Not supported method
-        pytest.param("PPPGDP", 2005, marks=NIE),
-        pytest.param(METHOD.PPPGDP, 2005, marks=NIE),
-        # Not supported period
-        pytest.param("EXC", 2010, marks=NIE),
-        pytest.param(METHOD.EXC, 2010, marks=NIE),
+        ("PPPGDP", 2005),
+        (METHOD.PPPGDP, 2005),
+        ("EXC", 2010),
+        (METHOD.EXC, 2010),
         # Invalid method str
         pytest.param("FOO", 2005, marks=pytest.mark.xfail(raises=ValueError)),
     ),
 )
 def test_currency(method: METHOD | str, period: int) -> None:
-    configure_currency(method, period)
+    configure_currency(method, period, _registry=_fresh_registry())
+
+
+def test_currency_data_file() -> None:
+    local_registry = _fresh_registry()
+    configure_currency("EXC", 2005, _registry=local_registry)
+    quantity = local_registry("42.1 USD_2020")
+    converted = quantity.to("EUR_2005")
+
+    assert_almost_equal(converted.magnitude, 26.022132012144635)
+
+
+def test_currency_pppgdp_data_file() -> None:
+    local_registry = _fresh_registry()
+    configure_currency("PPPGDP", 2005, _registry=local_registry)
+    quantity = local_registry("42.1 USD_2020")
+    converted = quantity.to("EUR_2005")
+
+    assert converted.magnitude == pytest.approx(28.25337281882418)
+
+
+def test_write_currency_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("iam_units.currency.DATA_PATH", tmp_path)
+    _write_currency_file(
+        tmp_path / "EXC-2005.txt",
+        [("EUR", "2005", 0.8038)],
+    )
+
+    loaded: pint.UnitRegistry = _fresh_registry()
+    configure_currency("EXC", 2005, _registry=loaded)
+    assert loaded("1 USD_2005").to("EUR_2005").magnitude == pytest.approx(0.8038)
 
 
 def test_emissions_gwp_versions() -> None:

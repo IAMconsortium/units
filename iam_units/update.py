@@ -1,9 +1,14 @@
 import sys
+from functools import cache
 from itertools import chain
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 # This package is only required when updating the emissions GWP conversion factors
 import globalwarmingpotentials as gwp
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 # Base path for package code
 BASE_PATH = Path(__file__).parent
@@ -91,19 +96,111 @@ _EMI_EQUIV = {
     }
 }
 
+_CURRENCY_PERIODS = ("2005", "2010", "2015", "2020", "2024")
+# DEU is used as the representative EUR-area series. For exchange rates this is
+# equivalent to any euro-area member because the national currency is EUR. For PPP
+# methods, the choice is specific to Germany and should remain documented.
+_CURRENCY_REF_AREA = {"EUR": "DEU"}
+_TRANSACTION_BY_METHOD = {
+    "EXC": "EXC_A",
+    "EXCE": "EXC_E",
+    "PPPGDP": "PPP_B1GQ",
+    "PPPPRC": "PPP_P31S14",
+    "PPPP41": "PPP_P41",
+}
+_CURRENCY_QUERY = {
+    "FREQ": "A",
+    "SECTOR": "S1",
+    "COUNTERPART_SECTOR": "S1",
+    "INSTR_ASSET": "F21",
+    "ACTIVITY": "_Z",
+    "EXPENDITURE": "_Z",
+    "UNIT_MEASURE": "XDC_USD",
+    "PRICE_BASE": "_Z",
+    "TRANSFORMATION": "N",
+    # OECD Table 4 data are exposed within DSD_NAMAIN10@DF_TABLE4 using T001.
+    "TABLE_IDENTIFIER": "T001",
+}
+
 
 def currency() -> None:
     """Update currency definitions files."""
-    # Currently no such files exist; see iam_units.currency.configure_currency().
-    #
-    # An implementation here should, at minimum:
-    # - Use the package `sdmx1` to query either the World Bank or OECD SDMX API.
-    # - Confirm these the different data sources give the same results; if not, expose
-    #   to the user an option to select the source.
-    # - Write to a simple text format that can be read by iam_units installation without
-    #   any dependencies; in a directory like iam_units/data/currency, with one file
-    #   per supported combination of (method, period).
-    raise NotImplementedError
+    data_path = DATA_PATH / "currency"
+    data_path.mkdir(exist_ok=True)
+
+    for method in _TRANSACTION_BY_METHOD:
+        for period in _CURRENCY_PERIODS:
+            rows = list(_fetch_currency_rows(method=method, period=period))
+            _write_currency_file(data_path / f"{method}-{period}.txt", rows)
+
+
+def _fetch_currency_rows(
+    method: str, period: str
+) -> "Iterable[tuple[str, str, float]]":
+    return _fetch_currency_rows_sdmx(method=method, period=period)
+
+
+def _fetch_currency_rows_sdmx(
+    method: str, period: str
+) -> "Iterable[tuple[str, str, float]]":
+    if method not in _TRANSACTION_BY_METHOD:
+        raise ValueError(f"Unsupported method={method!r}")
+
+    return _fetch_currency_rows_oecd()[method, period]
+
+
+@cache
+def _fetch_currency_rows_oecd() -> dict[
+    tuple[str, str], tuple[tuple[str, str, float], ...]
+]:
+    import sdmx
+    from sdmx import to_pandas
+
+    client = sdmx.Client("OECD")
+    result: dict[tuple[str, str], tuple[tuple[str, str, float], ...]] = {}
+
+    for currency, ref_area in _CURRENCY_REF_AREA.items():
+        msg = client.data(
+            "DSD_NAMAIN10@DF_TABLE4",
+            key={
+                **_CURRENCY_QUERY,
+                "REF_AREA": ref_area,
+                "TRANSACTION": "+".join(_TRANSACTION_BY_METHOD.values()),
+            },
+            params={
+                "startPeriod": min(_CURRENCY_PERIODS),
+                "endPeriod": max(_CURRENCY_PERIODS),
+            },
+        )
+        data = to_pandas(msg.data[0]).sort_index()
+
+        for method, transaction in _TRANSACTION_BY_METHOD.items():
+            for period in _CURRENCY_PERIODS:
+                selected = data.xs(transaction, level="TRANSACTION").xs(
+                    period, level="TIME_PERIOD"
+                )
+                if len(selected) != 1:
+                    raise ValueError(
+                        f"Expected 1 row for method={method} period={period} "
+                        f"currency={currency}; got {len(selected)}"
+                    )
+
+                result[method, period] = ((currency, period, float(selected.iloc[0])),)
+
+    return result
+
+
+def _write_currency_file(path: Path, rows: "Iterable[tuple[str, str, float]]") -> None:
+    method, period = path.stem.split("-")
+    lines = [
+        "# This file was generated using:",
+        "#    python -m iam_units.update currency",
+        f"# source=OECD flow=DSD_NAMAIN10@DF_TABLE4 method={method} period={period}",
+        "# representative_area[EUR]=DEU",
+        "# DO NOT ALTER THIS FILE MANUALLY!",
+    ]
+    lines.extend(f"{currency} {period} {value}" for currency, period, value in rows)
+    path.write_text("\n".join(lines) + "\n")
 
 
 def emissions() -> None:
