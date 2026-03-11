@@ -50,4 +50,7 @@ select = ["C9", "E", "F", "I", "W"]
 [tool.setuptools.packages]
 find = {}
 
+[tool.setuptools.package-data]
+iam_units = ["data/*.txt", "data/*/*.txt"]
+
 [tool.setuptools_scm]

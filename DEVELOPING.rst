@@ -74,3 +74,20 @@ Update these files using the command::
 
 The update submodule writes the context files.
 When adding a new context file, make sure to ``@import`` it in emissions.txt and expand the tests.
+
+
+Generated data files for currency conversions
+=============================================
+
+``iam_units/data/currency/*.txt`` stores one file per supported ``(method, period)``
+combination. These files are generated, committed package data and are loaded at runtime
+without any dependency on ``sdmx1``.
+
+Update these files using::
+
+    $ python -m iam_units.update currency
+
+The current generator uses OECD Table 4 via ``sdmx1``. ``EUR`` rows are derived from the
+``DEU`` series in that table: this is exact for exchange-rate methods because Germany's
+national currency is EUR, but it is a substantive modeling choice for PPP methods and
+should remain explicit in code and documentation.
