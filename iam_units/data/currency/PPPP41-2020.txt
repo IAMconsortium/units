@@ -1,6 +1,0 @@
-# This file was generated using:
-#    python -m iam_units.update currency
-# source=OECD flow=DSD_NAMAIN10@DF_TABLE4 method=PPPP41 period=2020
-# representative_area[EUR]=DEU
-# DO NOT ALTER THIS FILE MANUALLY!
-EUR 2020 0.702282

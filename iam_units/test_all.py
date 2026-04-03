@@ -1,4 +1,5 @@
 import importlib
+import importlib.util
 from pathlib import Path
 
 import numpy as np
@@ -7,9 +8,16 @@ import pytest
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from pint.util import UnitsContainer
 
-from iam_units import configure_currency, convert_gwp, emissions, format_mass, registry
+import iam_units.update as update_module
+from iam_units import (
+    configure_currency,
+    convert_gwp,
+    emissions,
+    format_mass,
+    registry,
+)
 from iam_units.currency import METHOD
-from iam_units.update import _write_currency_file
+from iam_units.update import _write_currency_module
 
 DEFAULTS = pint.get_application_registry()
 
@@ -134,16 +142,42 @@ def test_currency_allows_idempotent_redefinition_with_same_method() -> None:
     assert converted.magnitude == pytest.approx(26.022132012144635)
 
 
-def test_write_currency_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("iam_units.currency.DATA_PATH", tmp_path)
-    _write_currency_file(
-        tmp_path / "EXC-2005.txt",
-        [("EUR", "2005", 0.8038)],
+def test_write_currency_module(tmp_path: Path) -> None:
+    path = tmp_path / "currency_data.py"
+    _write_currency_module(
+        path,
+        {("EXC", "2005"): (("EUR", "2005", 0.8038),)},
     )
 
-    loaded: pint.UnitRegistry = _fresh_registry()
-    configure_currency("EXC", 2005, _registry=loaded)
-    assert loaded("1 USD_2005").to("EUR_2005").magnitude == pytest.approx(0.8038)
+    spec = importlib.util.spec_from_file_location("test_currency_data", path)
+    assert spec is not None
+    assert spec.loader is not None
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    assert module.DATA == {("EXC", "2005"): {("EUR", "2005"): 0.8038}}
+
+
+def test_update_currency(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    path = tmp_path / "currency_data.py"
+    monkeypatch.setattr(update_module, "CURRENCY_DATA_PATH", path)
+    monkeypatch.setattr(
+        update_module,
+        "_fetch_currency_rows_oecd",
+        lambda: {("EXC", "2005"): (("EUR", "2005", 0.8038),)},
+    )
+
+    update_module.currency()
+
+    spec = importlib.util.spec_from_file_location("test_generated_currency_data", path)
+    assert spec is not None
+    assert spec.loader is not None
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    assert module.DATA == {("EXC", "2005"): {("EUR", "2005"): 0.8038}}
 
 
 def test_emissions_gwp_versions() -> None:

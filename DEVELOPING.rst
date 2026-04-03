@@ -79,9 +79,9 @@ When adding a new context file, make sure to ``@import`` it in emissions.txt and
 Generated data files for currency conversions
 =============================================
 
-``iam_units/data/currency/*.txt`` stores one file per supported ``(method, period)``
-combination. These files are generated, committed package data and are loaded at runtime
-without any dependency on ``sdmx1``.
+``iam_units/currency_data.py`` stores generated currency-conversion data for the
+supported ``(method, period)`` combinations. This module is committed and loaded at
+runtime without any dependency on ``sdmx1``.
 
 Update these files using::
 

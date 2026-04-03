@@ -2,19 +2,16 @@ import sys
 from functools import cache
 from itertools import chain
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 # This package is only required when updating the emissions GWP conversion factors
 import globalwarmingpotentials as gwp
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable
 
 # Base path for package code
 BASE_PATH = Path(__file__).parent
 
 # Base path for package data
 DATA_PATH = BASE_PATH / "data"
+CURRENCY_DATA_PATH = BASE_PATH / "currency_data.py"
 
 
 # Format strings for emissions()
@@ -85,6 +82,17 @@ _EMI_METRICS = f"""{_EMI_HEADER}
 {{metrics}}
 """
 
+_CURRENCY_DATA = """# This file was generated using:
+#    python -m iam_units.update currency
+# source=OECD flow=DSD_NAMAIN10@DF_TABLE4
+# representative_area[EUR]=DEU
+# DO NOT ALTER THIS FILE MANUALLY!
+
+DATA = {{
+{data}
+}}
+"""
+
 # Equivalents: different symbols for the same species.
 _EMI_EQUIV = {
     "CO2": {
@@ -130,14 +138,8 @@ _CURRENCY_QUERY = {
 
 
 def currency() -> None:
-    """Update currency definitions files."""
-    data_path = DATA_PATH / "currency"
-    data_path.mkdir(exist_ok=True)
-
-    for method in _TRANSACTION_BY_METHOD:
-        for period in _CURRENCY_PERIODS:
-            rows = list(_fetch_currency_rows_oecd()[method, period])
-            _write_currency_file(data_path / f"{method}-{period}.txt", rows)
+    """Update the generated currency data module."""
+    _write_currency_module(CURRENCY_DATA_PATH, _fetch_currency_rows_oecd())
 
 
 @cache
@@ -181,17 +183,21 @@ def _fetch_currency_rows_oecd() -> dict[
     return result
 
 
-def _write_currency_file(path: Path, rows: "Iterable[tuple[str, str, float]]") -> None:
-    method, period = path.stem.split("-")
+def _write_currency_module(
+    path: Path, data: dict[tuple[str, str], tuple[tuple[str, str, float], ...]]
+) -> None:
     lines = [
-        "# This file was generated using:",
-        "#    python -m iam_units.update currency",
-        f"# source=OECD flow=DSD_NAMAIN10@DF_TABLE4 method={method} period={period}",
-        "# representative_area[EUR]=DEU",
-        "# DO NOT ALTER THIS FILE MANUALLY!",
+        "    "
+        + repr((method, period))
+        + ": {"
+        + ", ".join(
+            f"{(currency, row_period)!r}: {value:.6f}"
+            for currency, row_period, value in rows
+        )
+        + "},"
+        for (method, period), rows in sorted(data.items())
     ]
-    lines.extend(f"{currency} {period} {value:.6f}" for currency, period, value in rows)
-    path.write_text("\n".join(lines) + "\n")
+    path.write_text(_CURRENCY_DATA.format(data="\n".join(lines)))
 
 
 def emissions() -> None:

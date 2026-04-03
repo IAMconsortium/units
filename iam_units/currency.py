@@ -1,13 +1,13 @@
 """Currency conversions."""
 
 from enum import Enum, auto
-from pathlib import Path
 from typing import TYPE_CHECKING
+
+from .currency_data import DATA
 
 if TYPE_CHECKING:
     from pint import UnitRegistry
 
-DATA_PATH = Path(__file__).with_name("data") / "currency"
 CONFIGURED_CURRENCY_ATTR = "_iam_units_configured_currency_methods"
 
 
@@ -70,7 +70,16 @@ def configure_currency(
     # Ensure string
     period = str(period)
 
-    data = _load_currency_data(method, period)
+    try:
+        data = DATA[method.name, period].copy()
+    except KeyError:
+        message = []
+        if method is not METHOD.EXC:
+            message.append(f"method={method!r}")
+        if period != "2005":
+            message.append(f"period={period}")
+        raise NotImplementedError(", ".join(message))
+
     configured = dict(getattr(registry, CONFIGURED_CURRENCY_ATTR, {}))
     conflicts = [
         (other, file_period, configured[(other, file_period)])
@@ -100,29 +109,3 @@ def configure_currency(
 
     configured.update({key: method for key in data})
     setattr(registry, CONFIGURED_CURRENCY_ATTR, configured)
-
-
-def _load_currency_data(method: METHOD, period: str) -> dict[tuple[str, str], float]:
-    path = DATA_PATH / f"{method.name}-{period}.txt"
-
-    if not path.exists():
-        message = []
-        if method is not METHOD.EXC:
-            message.append(f"method={method!r}")
-        if period != "2005":
-            message.append(f"period={period}")
-        raise NotImplementedError(", ".join(message))
-
-    result: dict[tuple[str, str], float] = {}
-    for raw_line in path.read_text().splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#"):
-            continue
-
-        other, file_period, value = line.split()
-        result[(other, file_period)] = float(value)
-
-    if not result:
-        raise ValueError(f"No currency data found in {path}")
-
-    return result
