@@ -24,7 +24,9 @@ DEFAULTS = pint.get_application_registry()
 NIE = pytest.mark.xfail(raises=NotImplementedError)
 
 
-def _fresh_registry() -> pint.UnitRegistry:
+@pytest.fixture(scope="function")
+def local_registry() -> pint.UnitRegistry:
+    """A new registry with freshly-loaded definitions."""
     loaded_registry: pint.UnitRegistry = pint.UnitRegistry()
     loaded_registry.load_definitions(
         str(Path(__file__).parent / "data" / "definitions.txt")
@@ -94,12 +96,13 @@ def test_kt() -> None:
         pytest.param("FOO", 2005, marks=pytest.mark.xfail(raises=ValueError)),
     ),
 )
-def test_currency(method: METHOD | str, period: int) -> None:
-    configure_currency(method, period, _registry=_fresh_registry())
+def test_currency(
+    local_registry: pint.UnitRegistry, method: METHOD | str, period: int
+) -> None:
+    configure_currency(method, period, _registry=local_registry)
 
 
-def test_currency_data_file() -> None:
-    local_registry = _fresh_registry()
+def test_currency_data_file(local_registry: pint.UnitRegistry) -> None:
     configure_currency("EXC", 2005, _registry=local_registry)
     quantity = local_registry("42.1 USD_2020")
     converted = quantity.to("EUR_2005")
@@ -107,8 +110,7 @@ def test_currency_data_file() -> None:
     assert_almost_equal(converted.magnitude, 26.022132012144635)
 
 
-def test_currency_pppgdp_data_file() -> None:
-    local_registry = _fresh_registry()
+def test_currency_pppgdp_data_file(local_registry: pint.UnitRegistry) -> None:
     configure_currency("PPPGDP", 2005, _registry=local_registry)
     quantity = local_registry("42.1 USD_2020")
     converted = quantity.to("EUR_2005")
@@ -116,8 +118,9 @@ def test_currency_pppgdp_data_file() -> None:
     assert converted.magnitude == pytest.approx(28.25337281882418)
 
 
-def test_currency_rejects_redefinition_with_different_method() -> None:
-    local_registry = _fresh_registry()
+def test_currency_rejects_redefinition_with_different_method(
+    local_registry: pint.UnitRegistry,
+) -> None:
     configure_currency("EXC", 2005, _registry=local_registry)
 
     with pytest.raises(
@@ -133,8 +136,9 @@ def test_currency_rejects_redefinition_with_different_method() -> None:
     assert converted.magnitude == pytest.approx(26.022132012144635)
 
 
-def test_currency_allows_idempotent_redefinition_with_same_method() -> None:
-    local_registry = _fresh_registry()
+def test_currency_allows_idempotent_redefinition_with_same_method(
+    local_registry: pint.UnitRegistry,
+) -> None:
     configure_currency("EXC", 2005, _registry=local_registry)
     configure_currency("EXC", 2005, _registry=local_registry)
 
