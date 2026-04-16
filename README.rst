@@ -191,11 +191,16 @@ To enable conversions between *different* currencies, use the function ``configu
    >>> qty.to("EUR_2005")
    26.022132012144635 <Unit('EUR_2005')>
 
-Currently ``iam_units`` only supports:
+Calling ``configure_currency()`` again with the same method and currency/period pair on
+the same registry is a no-op. Calling it with a different method for an already
+configured pair raises ``ValueError`` rather than silently reusing the first definition.
 
-- period-average exchange rates for annual periods (method="EXC");
-- period="2005"; and
-- the two currencies mentioned above.
+Currently ``iam_units`` supports:
+
+- annual OECD Table 4 exchange-rate / PPP methods ``EXC``, ``EXCE``, ``PPPGDP``,
+  ``PPPPRC``, and ``PPPP41``;
+- EUR for the periods 2005, 2010, 2015, 2020, and 2024; and
+- USD as the base currency for those conversions.
 
 Up to v2025.9.12, ``configure_currency("EXC", 2005)`` was called automatically.
 

@@ -1,4 +1,6 @@
 import importlib
+import importlib.util
+from pathlib import Path
 
 import numpy as np
 import pint
@@ -6,12 +8,31 @@ import pytest
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from pint.util import UnitsContainer
 
-from iam_units import configure_currency, convert_gwp, emissions, format_mass, registry
+import iam_units.update as update_module
+from iam_units import (
+    configure_currency,
+    convert_gwp,
+    emissions,
+    format_mass,
+    registry,
+)
 from iam_units.currency import METHOD
+from iam_units.update import _write_currency_module
 
 DEFAULTS = pint.get_application_registry()
 
 NIE = pytest.mark.xfail(raises=NotImplementedError)
+
+
+@pytest.fixture(scope="function")
+def local_registry() -> pint.UnitRegistry:
+    """A new registry with freshly-loaded definitions."""
+    loaded_registry: pint.UnitRegistry = pint.UnitRegistry()
+    loaded_registry.load_definitions(
+        str(Path(__file__).parent / "data" / "definitions.txt")
+    )
+    return loaded_registry
+
 
 # Parameters for test_units(), tuple of:
 # 1. A literal string to be parsed as a unit.
@@ -67,18 +88,100 @@ def test_kt() -> None:
 @pytest.mark.parametrize(
     "method, period",
     (
-        # Not supported method
-        pytest.param("PPPGDP", 2005, marks=NIE),
-        pytest.param(METHOD.PPPGDP, 2005, marks=NIE),
-        # Not supported period
-        pytest.param("EXC", 2010, marks=NIE),
-        pytest.param(METHOD.EXC, 2010, marks=NIE),
+        ("PPPGDP", 2005),
+        (METHOD.PPPGDP, 2005),
+        ("EXC", 2010),
+        (METHOD.EXC, 2010),
         # Invalid method str
         pytest.param("FOO", 2005, marks=pytest.mark.xfail(raises=ValueError)),
     ),
 )
-def test_currency(method: METHOD | str, period: int) -> None:
-    configure_currency(method, period)
+def test_currency(
+    local_registry: pint.UnitRegistry, method: METHOD | str, period: int
+) -> None:
+    configure_currency(method, period, _registry=local_registry)
+
+
+def test_currency_data_file(local_registry: pint.UnitRegistry) -> None:
+    configure_currency("EXC", 2005, _registry=local_registry)
+    quantity = local_registry("42.1 USD_2020")
+    converted = quantity.to("EUR_2005")
+
+    assert_almost_equal(converted.magnitude, 26.022132012144635)
+
+
+def test_currency_pppgdp_data_file(local_registry: pint.UnitRegistry) -> None:
+    configure_currency("PPPGDP", 2005, _registry=local_registry)
+    quantity = local_registry("42.1 USD_2020")
+    converted = quantity.to("EUR_2005")
+
+    assert converted.magnitude == pytest.approx(28.25337281882418)
+
+
+def test_currency_rejects_redefinition_with_different_method(
+    local_registry: pint.UnitRegistry,
+) -> None:
+    configure_currency("EXC", 2005, _registry=local_registry)
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "cannot change to method='PPPGDP' for already defined units: EUR_2005 "
+            r"\(configured with method='EXC'\)"
+        ),
+    ):
+        configure_currency("PPPGDP", 2005, _registry=local_registry)
+
+    converted = local_registry("42.1 USD_2020").to("EUR_2005")
+    assert converted.magnitude == pytest.approx(26.022132012144635)
+
+
+def test_currency_allows_idempotent_redefinition_with_same_method(
+    local_registry: pint.UnitRegistry,
+) -> None:
+    configure_currency("EXC", 2005, _registry=local_registry)
+    configure_currency("EXC", 2005, _registry=local_registry)
+
+    converted = local_registry("42.1 USD_2020").to("EUR_2005")
+    assert converted.magnitude == pytest.approx(26.022132012144635)
+
+
+def test_write_currency_module(tmp_path: Path) -> None:
+    path = tmp_path / "currency_data.py"
+    _write_currency_module(
+        path,
+        {("EXC", "2005"): (("EUR", "2005", 0.8038),)},
+    )
+
+    spec = importlib.util.spec_from_file_location("test_currency_data", path)
+    assert spec is not None
+    assert spec.loader is not None
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    assert module.DATA == {("EXC", "2005"): {("EUR", "2005"): 0.8038}}
+
+
+def test_update_currency(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    path = tmp_path / "currency_data.py"
+    monkeypatch.setattr(update_module, "CURRENCY_DATA_PATH", path)
+    monkeypatch.setattr(
+        update_module,
+        "_fetch_currency_rows_oecd",
+        lambda: {("EXC", "2005"): (("EUR", "2005", 0.8038),)},
+    )
+
+    update_module.currency()
+
+    spec = importlib.util.spec_from_file_location("test_generated_currency_data", path)
+    assert spec is not None
+    assert spec.loader is not None
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    assert module.DATA == {("EXC", "2005"): {("EUR", "2005"): 0.8038}}
 
 
 def test_emissions_gwp_versions() -> None:

@@ -1,4 +1,5 @@
 import sys
+from functools import cache
 from itertools import chain
 from pathlib import Path
 
@@ -10,6 +11,7 @@ BASE_PATH = Path(__file__).parent
 
 # Base path for package data
 DATA_PATH = BASE_PATH / "data"
+CURRENCY_DATA_PATH = BASE_PATH / "currency_data.py"
 
 
 # Format strings for emissions()
@@ -80,6 +82,17 @@ _EMI_METRICS = f"""{_EMI_HEADER}
 {{metrics}}
 """
 
+_CURRENCY_DATA = """# This file was generated using:
+#    python -m iam_units.update currency
+# source=OECD flow=DSD_NAMAIN10@DF_TABLE4
+# representative_area[EUR]=DEU
+# DO NOT ALTER THIS FILE MANUALLY!
+
+DATA = {{
+{data}
+}}
+"""
+
 # Equivalents: different symbols for the same species.
 _EMI_EQUIV = {
     "CO2": {
@@ -91,19 +104,100 @@ _EMI_EQUIV = {
     }
 }
 
+_CURRENCY_PERIODS = ("2005", "2010", "2015", "2020", "2024")
+# OECD Table 4 supplies the primary source for all currently supported methods.
+# Cross-source validation against World Bank overlap is deferred to a follow-up
+# PR because the WDI SDMX metadata/dataflow path was unreliable in live tests.
+# DEU is used as the representative EUR-area series. For exchange rates this is
+# equivalent to any euro-area member because the national currency is EUR. For PPP
+# methods, the choice is specific to Germany and should remain documented.
+_CURRENCY_REF_AREA = {"EUR": "DEU"}
+_TRANSACTION_BY_METHOD = {
+    "EXC": "EXC_A",
+    "EXCE": "EXC_E",
+    "PPPGDP": "PPP_B1GQ",
+    "PPPPRC": "PPP_P31S14",
+    "PPPP41": "PPP_P41",
+}
+_CURRENCY_QUERY = {
+    "FREQ": "A",
+    # These dimensions are invariant for the five Table 4 transactions used here:
+    # annual frequency, total economy vs total economy, currency-to-USD quotes,
+    # and the canonical national-accounts table transformation.
+    "SECTOR": "S1",
+    "COUNTERPART_SECTOR": "S1",
+    "INSTR_ASSET": "F21",
+    "ACTIVITY": "_Z",
+    "EXPENDITURE": "_Z",
+    "UNIT_MEASURE": "XDC_USD",
+    "PRICE_BASE": "_Z",
+    "TRANSFORMATION": "N",
+    # OECD Table 4 data are exposed within DSD_NAMAIN10@DF_TABLE4 using T001.
+    "TABLE_IDENTIFIER": "T001",
+}
+
 
 def currency() -> None:
-    """Update currency definitions files."""
-    # Currently no such files exist; see iam_units.currency.configure_currency().
-    #
-    # An implementation here should, at minimum:
-    # - Use the package `sdmx1` to query either the World Bank or OECD SDMX API.
-    # - Confirm these the different data sources give the same results; if not, expose
-    #   to the user an option to select the source.
-    # - Write to a simple text format that can be read by iam_units installation without
-    #   any dependencies; in a directory like iam_units/data/currency, with one file
-    #   per supported combination of (method, period).
-    raise NotImplementedError
+    """Update the generated currency data module."""
+    _write_currency_module(CURRENCY_DATA_PATH, _fetch_currency_rows_oecd())
+
+
+@cache
+def _fetch_currency_rows_oecd() -> dict[
+    tuple[str, str], tuple[tuple[str, str, float], ...]
+]:
+    import sdmx
+    from sdmx import to_pandas
+
+    client = sdmx.Client("OECD")
+    result: dict[tuple[str, str], tuple[tuple[str, str, float], ...]] = {}
+
+    for currency, ref_area in _CURRENCY_REF_AREA.items():
+        msg = client.data(
+            "DSD_NAMAIN10@DF_TABLE4",
+            key={
+                **_CURRENCY_QUERY,
+                "REF_AREA": ref_area,
+                "TRANSACTION": "+".join(_TRANSACTION_BY_METHOD.values()),
+            },
+            params={
+                "startPeriod": min(_CURRENCY_PERIODS),
+                "endPeriod": max(_CURRENCY_PERIODS),
+            },
+        )
+        data = to_pandas(msg.data[0]).sort_index()
+
+        for method, transaction in _TRANSACTION_BY_METHOD.items():
+            for period in _CURRENCY_PERIODS:
+                selected = data.xs(transaction, level="TRANSACTION").xs(
+                    period, level="TIME_PERIOD"
+                )
+                if len(selected) != 1:
+                    raise ValueError(
+                        f"Expected 1 row for method={method} period={period} "
+                        f"currency={currency}; got {len(selected)}"
+                    )
+
+                result[method, period] = ((currency, period, float(selected.iloc[0])),)
+
+    return result
+
+
+def _write_currency_module(
+    path: Path, data: dict[tuple[str, str], tuple[tuple[str, str, float], ...]]
+) -> None:
+    lines = [
+        "    "
+        + repr((method, period))
+        + ": {"
+        + ", ".join(
+            f"{(currency, row_period)!r}: {value:.6f}"
+            for currency, row_period, value in rows
+        )
+        + "},"
+        for (method, period), rows in sorted(data.items())
+    ]
+    path.write_text(_CURRENCY_DATA.format(data="\n".join(lines)))
 
 
 def emissions() -> None:
