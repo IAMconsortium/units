@@ -49,12 +49,14 @@ def configure_currency(
     -----
     Currency units can only be configured once per ``(currency, period)`` pair and
     method on a given registry. Repeated calls with the same method are a no-op; a
-    different method for an already configured pair raises ``ValueError``.
+    different method raises an exception for any already-configured pairs.
 
     Raises
     ------
     NotImplementedError
         For unsupported values of `method` or `period`.
+    ValueError
+        For repeated calls with different `method`.
     """
     if _registry is None:
         from iam_units import registry
@@ -73,39 +75,33 @@ def configure_currency(
     try:
         data = DATA[method.name, period].copy()
     except KeyError:
-        message = []
-        if method is not METHOD.EXC:
-            message.append(f"method={method!r}")
-        if period != "2005":
-            message.append(f"period={period}")
-        raise NotImplementedError(", ".join(message))
+        raise NotImplementedError(
+            f"Convert currency for method={method!r}, period={period}; use one of:\n"
+            + repr(sorted(DATA))
+        )
 
+    # Maybe retrieve a dict mapping from (other, period): method for every already-
+    # configured currency
     configured = dict(getattr(registry, CONFIGURED_CURRENCY_ATTR, {}))
-    conflicts = [
-        (other, file_period, configured[(other, file_period)])
-        for other, file_period in data
-        if configured.get((other, file_period), method) is not method
-    ]
 
-    if conflicts:
-        unit_list = ", ".join(
-            sorted(
-                (
-                    f"{other}_{file_period} "
-                    f"(already configured with {configured_method.name})"
-                )
-                for other, file_period, configured_method in conflicts
-            )
+    # Identify any conflicting, existing configurations: keys appearing in both `data`
+    # and `configured` with different methods
+    if conflicts := {
+        k: m for k, m in configured.items() if k in data and m is not method
+    }:
+        unit_list = sorted(
+            (f"{other}_{period} (configured with method={method_configured.name!r})")
+            for (other, period), method_configured in conflicts.items()
         )
         raise ValueError(
-            f"Currency unit(s) already defined on this registry: {unit_list}. "
-            "configure_currency() cannot switch methods for an existing "
-            "(currency, period) pair."
+            f"configure_currency() cannot change to method={method.name!r} for already "
+            f"defined units: {', '.join(unit_list)}"
         )
 
     # Insert definitions
     for (other, period), value in data.items():
         registry.define(f"{other}_{period} = USD_{period} / {value} = {other}")
+        configured[(other, period)] = method
 
-    configured.update({key: method for key in data})
+    # Store information about configuration
     setattr(registry, CONFIGURED_CURRENCY_ATTR, configured)

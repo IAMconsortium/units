@@ -123,8 +123,8 @@ def test_currency_rejects_redefinition_with_different_method() -> None:
     with pytest.raises(
         ValueError,
         match=(
-            r"Currency unit\(s\) already defined on this registry: "
-            r"EUR_2005 \(already configured with EXC\)"
+            "cannot change to method='PPPGDP' for already defined units: EUR_2005 "
+            r"\(configured with method='EXC'\)"
         ),
     ):
         configure_currency("PPPGDP", 2005, _registry=local_registry)
