@@ -50,7 +50,7 @@ jobs:
       run: coverage run --append -m iam_units.update emissions || exit 0
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@v7
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
