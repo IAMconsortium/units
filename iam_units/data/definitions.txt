@@ -50,17 +50,18 @@ USD_2005 = [currency] = USD
 # https://data.worldbank.org/indicator/NY.GDP.DEFL.KD.ZG?locations=XC
 # Factor calculated by taking the product of annual values in %, so for 
 # example EUR_2007 = (1 - (V_2007/100)) * (1 - (V_2006/100)) * EUR_2005 
-# last update: 2026-03-10
+# last update: 2026-06-02
 
 EUR_2005 = [currency_EUR] = EUR
 EUR_2000 = 1.166531 * EUR_2005
 EUR_2010 = 0.901141 * EUR_2005
+EUR_2015 = 0.846094 * EUR_2005
 EUR_2020 = 0.785147 * EUR_2005
 EUR_2024 = 0.647739 * EUR_2005
 
 # United States' GDP deflator, data from
 # https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US
-# last update: 2023-06-29
+# last update: 2026-08-14
 
 USD_2015 = USD_2005 * 0.8358
 
@@ -87,6 +88,8 @@ USD_2019 = USD_2015 / 1.0729
 USD_2020 = USD_2015 / 1.0869
 USD_2021 = USD_2015 / 1.1357
 USD_2022 = USD_2015 / 1.2152
+USD_2023 = USD_2015 / 1.2577
+USD_2024 = USD_2015 / 1.2889
 
 # Transportation activity
 
