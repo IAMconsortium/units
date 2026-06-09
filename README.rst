@@ -171,7 +171,7 @@ Currency
 
 ``iam_units`` defines deflators for:
 
-- USD (United States dollar) for annual periods from 2000 to 2022 inclusive.
+- USD (United States dollar) for annual periods from 2000 to 2024 inclusive.
 - EUR (Euro) for the periods 2005, 2010, 2015, 2020, and 2024 only.
 
 These can be used via pint-compatible unit expressions like ``USD_2019``
@@ -191,15 +191,29 @@ To enable conversions between *different* currencies, use the function ``configu
    >>> qty.to("EUR_2005")
    26.022132012144635 <Unit('EUR_2005')>
 
-Calling ``configure_currency()`` again with the same method and currency/period pair on
-the same registry is a no-op. Calling it with a different method for an already
-configured pair raises ``ValueError`` rather than silently reusing the first definition.
+``period`` selects the year of the USD↔EUR exchange rate used to *bridge* the two
+currencies — not the target vintage. The within-currency deflator chains then carry any
+``USD_*`` vintage to any defined ``EUR_*`` vintage; because the currencies do not
+inflate in lock-step, different ``period`` values give different results:
+
+.. code-block:: python
+
+   # On a fresh registry — bridge at the 2010 exchange rate instead
+   >>> configure_currency(method="EXC", period="2010")
+
+   >>> registry("100 USD_2010").to("EUR_2024")
+   104.940225 <Unit('EUR_2024')>
+
+A registry holds one bridge per target currency: repeated calls with the same ``method``
+and ``period`` are a no-op, and changing either raises ``ValueError``. ``period=2005``
+gives the same results as previous versions.
 
 Currently ``iam_units`` supports:
 
 - annual OECD Table 4 exchange-rate / PPP methods ``EXC``, ``EXCE``, ``PPPGDP``,
   ``PPPPRC``, and ``PPPP41``;
-- EUR for the periods 2005, 2010, 2015, 2020, and 2024; and
+- any ``period`` that is both an OECD exchange-rate year and a defined EUR deflator
+  vintage: 2005, 2010, 2015, 2020, and 2024; and
 - USD as the base currency for those conversions.
 
 Up to v2025.9.12, ``configure_currency("EXC", 2005)`` was called automatically.
