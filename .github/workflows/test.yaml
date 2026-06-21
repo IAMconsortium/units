@@ -26,7 +26,7 @@ jobs:
     name: "python:${{ matrix.python-version }} pint:${{ matrix.pint-version }}"
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Set up uv, Python
       uses: astral-sh/setup-uv@v7
@@ -50,7 +50,7 @@ jobs:
       run: coverage run --append -m iam_units.update emissions || exit 0
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@v7
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: astral-sh/setup-uv@v7
       with: { enable-cache: true, python-version: "3.14" }
     - name: Clear and re-create the pre-commit environments
