@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 from collections.abc import Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -157,7 +158,7 @@ def _initialize() -> pint.UnitRegistry:
 
     # Identify cache folder: from environment variable, or default
     cache_folder = os.environ.get("IAM_UNITS_CACHE", None) or user_cache_path(
-        "iam-units"
+        "iam-units", version=f"{sys.version_info.major}.{sys.version_info.minor}"
     )
 
     # Create the registry, using a disk cache
