@@ -118,20 +118,60 @@ def test_currency_pppgdp_data_file(local_registry: pint.UnitRegistry) -> None:
     assert converted.magnitude == pytest.approx(28.25337281882418)
 
 
-def test_currency_rejects_redefinition_with_different_method(
+# Parameters for test_currency_bridge(), tuple of:
+# 1. `period` argument to configure_currency().
+# 2. A literal string to be parsed as a quantity.
+# 3. Target units.
+# 4. Expected magnitude of the conversion.
+# Every period in currency_data.DATA and every EUR vintage appears at least once.
+@pytest.mark.parametrize(
+    "period, expr, target, expected",
+    (
+        (2010, "100 USD_2010", "EUR_2024", 104.94022539464198),
+        (2015, "100 USD_2022", "EUR_2000", 53.795012609053),
+        (2020, "100 USD_2005", "EUR_2015", 105.65223993909703),
+        (2024, "100 USD_2024", "EUR_2010", 66.40909521484429),
+        (2005, "100 USD_2019", "EUR_2020", 79.75173644050624),
+        # Reverse direction
+        (2010, "100 EUR_2005", "USD_2015", 160.15168774272087),
+    ),
+)
+def test_currency_bridge(
     local_registry: pint.UnitRegistry,
+    period: int,
+    expr: str,
+    target: str,
+    expected: float,
+) -> None:
+    # Any USD vintage reaches any EUR vintage: across the bridge at `period`'s exchange
+    # rate, then along the EUR deflator chain.
+    configure_currency("EXC", period, _registry=local_registry)
+
+    assert local_registry(expr).to(target).magnitude == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    "method, period",
+    (
+        ("EXC", 2024),  # Same method, different period
+        ("PPPGDP", 2005),  # Different method, same period
+    ),
+)
+def test_currency_rejects_redefinition(
+    local_registry: pint.UnitRegistry, method: str, period: int
 ) -> None:
     configure_currency("EXC", 2005, _registry=local_registry)
 
     with pytest.raises(
         ValueError,
         match=(
-            "cannot change to method='PPPGDP' for already defined units: EUR_2005 "
-            r"\(configured with method='EXC'\)"
+            f"cannot change to method='{method}', period={period} for already "
+            r"configured: EUR \(configured with method='EXC', period=2005\)"
         ),
     ):
-        configure_currency("PPPGDP", 2005, _registry=local_registry)
+        configure_currency(method, period, _registry=local_registry)
 
+    # The original bridge is intact after the rejected switch
     converted = local_registry("42.1 USD_2020").to("EUR_2005")
     assert converted.magnitude == pytest.approx(26.022132012144635)
 

@@ -8,7 +8,7 @@ from .currency_data import DATA
 if TYPE_CHECKING:
     from pint import UnitRegistry
 
-CONFIGURED_CURRENCY_ATTR = "_iam_units_configured_currency_methods"
+CONFIGURED_CURRENCY_ATTR = "_iam_units_configured_currency_bridges"
 
 
 class METHOD(Enum):
@@ -43,20 +43,28 @@ def configure_currency(
     method : METHOD or str
         Method of computing exchange rate data.
     period : int or str
-        Time period (e.g. year) for exchange rates.
+        Year of the USD↔currency exchange rate used to bridge the two currencies.
 
     Notes
     -----
-    Currency units can only be configured once per ``(currency, period)`` pair and
-    method on a given registry. Repeated calls with the same method are a no-op; a
-    different method raises an exception for any already-configured pairs.
+    `period` selects only the exchange-rate bridge year; the within-currency deflator
+    chains then carry any USD vintage to any defined target vintage. For example,
+    ``configure_currency("EXC", 2010)`` converts between any ``USD_*`` and any ``EUR_*``
+    using the 2010 EUR/USD exchange rate as the bridge. Because the currencies do not
+    inflate in lock-step, different `period` values give different results.
+
+    A registry holds one bridge per target currency. Repeated calls with the same
+    `method` and `period` are a no-op; a call that changes either for an
+    already-configured currency raises, rather than silently altering earlier
+    conversions.
 
     Raises
     ------
     NotImplementedError
         For unsupported values of `method` or `period`.
     ValueError
-        For repeated calls with different `method`.
+        For an unknown `method`, or a call that changes the configured `method` or
+        `period` for an already-bridged currency.
     """
     if _registry is None:
         from iam_units import registry
@@ -73,35 +81,50 @@ def configure_currency(
     period = str(period)
 
     try:
-        data = DATA[method.name, period].copy()
+        data = DATA[method.name, period]
     except KeyError:
         raise NotImplementedError(
             f"Convert currency for method={method!r}, period={period}; use one of:\n"
             + repr(sorted(DATA))
         )
 
-    # Maybe retrieve a dict mapping from (other, period): method for every already-
-    # configured currency
-    configured = dict(getattr(registry, CONFIGURED_CURRENCY_ATTR, {}))
+    # One bridge per target currency: map each currency to its active (method, period)
+    bridge = (method, period)
+    configured: dict[str, tuple[METHOD, str]] = dict(
+        getattr(registry, CONFIGURED_CURRENCY_ATTR, {})
+    )
 
-    # Identify any conflicting, existing configurations: keys appearing in both `data`
-    # and `configured` with different methods
+    # Identify any conflicting, existing configurations: currencies already bridged
+    # with a different method or period
     if conflicts := {
-        k: m for k, m in configured.items() if k in data and m is not method
+        other: existing
+        for other, _ in data
+        if (existing := configured.get(other)) is not None and existing != bridge
     }:
-        unit_list = sorted(
-            (f"{other}_{period} (configured with method={method_configured.name!r})")
-            for (other, period), method_configured in conflicts.items()
+        detail = ", ".join(
+            f"{other} (configured with method={m.name!r}, period={p})"
+            for other, (m, p) in sorted(conflicts.items())
         )
         raise ValueError(
-            f"configure_currency() cannot change to method={method.name!r} for already "
-            f"defined units: {', '.join(unit_list)}"
+            f"configure_currency() cannot change to method={method.name!r}, "
+            f"period={period} for already configured: {detail}"
         )
 
-    # Insert definitions
-    for (other, period), value in data.items():
-        registry.define(f"{other}_{period} = USD_{period} / {value} = {other}")
-        configured[(other, period)] = method
+    # Anchor the bridge at each target currency's chain base ({other}_2005): dividing
+    # the exchange rate by _{other}_deflator_{period} (defined alongside the vintages in
+    # definitions.txt) keeps the whole {other} vintage chain connected to USD through
+    # the chosen bridge year.
+    pending = {
+        other: rate
+        for (other, _), rate in data.items()
+        if configured.get(other) != bridge
+    }
+    for other, rate in pending.items():
+        registry.define(
+            f"{other}_2005 = USD_{period} / {rate} / _{other}_deflator_{period}"
+            f" = {other}"
+        )
+        configured[other] = bridge
 
-    # Store information about configuration
-    setattr(registry, CONFIGURED_CURRENCY_ATTR, configured)
+    if pending:
+        setattr(registry, CONFIGURED_CURRENCY_ATTR, configured)

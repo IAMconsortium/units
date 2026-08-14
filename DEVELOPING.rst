@@ -91,3 +91,16 @@ The current generator uses OECD Table 4 via ``sdmx1``. ``EUR`` rows are derived 
 ``DEU`` series in that table: this is exact for exchange-rate methods because Germany's
 national currency is EUR, but it is a substantive modeling choice for PPP methods and
 should remain explicit in code and documentation.
+
+Extending the supported periods or currencies also requires manual edits to
+``iam_units/data/definitions.txt``, which is not generated:
+
+- Every period listed in ``update._CURRENCY_PERIODS`` needs a matching
+  ``_{currency}_deflator_{period}`` factor. ``configure_currency()`` refers to these by
+  name when it defines the bridge. pint resolves a definition lazily, so a missing
+  factor is accepted there and raises ``UndefinedUnitError`` at the first conversion.
+- Every currency needs a chain anchor ``{currency}_2005``, against which its other
+  vintages and the bridge are defined.
+
+``test_currency_bridge`` covers each period with a pinned expected magnitude; expand it
+when adding one.
