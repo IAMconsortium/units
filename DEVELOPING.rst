@@ -18,39 +18,44 @@ Thus:
 Releasing
 =========
 
+Before releasing, check https://github.com/IAMconsortium/units/actions/workflows/test.yaml to ensure that the push and scheduled builds are passing.
+Address any failures before releasing.
 
-Releasing
-*********
+1. Create a new branch::
 
-1. Before releasing, check https://github.com/IAMconsortium/units/actions/workflows/test.yaml to ensure that the push and scheduled builds are passing.
-   Address any failures before releasing.
+    $ git checkout -b release/YYYY.MM.DD
 
-2. Tag the release candidate version, i.e. with a ``rcN`` suffix, and push::
+2. Tag the release candidate (RC) version, i.e. with a ``rcN`` suffix, and push::
 
     $ git tag v2021.3.22rc1
-    $ git push --tags origin main
+    $ git push --tags origin release/YYYY.MM.DD
 
-3. Check:
+3. Open a PR with the title “Release vYYYY.MM.DD” using this branch.
+   Check:
 
    - at https://github.com/IAMconsortium/units/actions/workflows/publish.yaml that the workflow completes: the package builds successfully and is published to TestPyPI.
-   - at https://test.pypi.org/project/iam-units/ that:
+   - at https://pypi.org/project/iam-units/ that:
 
-      - The package can be downloaded, installed and run.
+      - The release candidate package can be downloaded, installed and run.
       - The README is rendered correctly.
 
    Address any warnings or errors that appear.
    If needed, make a new commit and go back to step (2), incrementing the rc number.
 
-4. (optional) Tag the release itself and push::
+4. Merge the PR using the ‘rebase and merge’ method.
 
+5. (optional) Switch back to the ``main`` branch, tag the release itself (*without* an RC number) and push::
+
+    $ git checkout main
+    $ git pull --fast-forward
     $ git tag v2021.3.22
     $ git push --tags origin main
 
-   This step (but *not* step (2)) can also be performed directly on GitHub; see (5), next.
+   This step (but *not* step (2)) can also be performed directly on GitHub; see (6), next.
 
-5. Visit https://github.com/IAMconsortium/units/releases and mark the new release: either using the pushed tag from (4), or by creating the tag and release simultaneously.
+6. Visit https://github.com/IAMconsortium/units/releases and mark the new release: either using the pushed tag from (5), or by creating the tag and release simultaneously.
 
-6. Check at https://github.com/IAMconsortium/units/actions/workflows/publish.yaml and https://pypi.org/project/iam-units/ that the distributions are published.
+7. Check at https://github.com/IAMconsortium/units/actions/workflows/publish.yaml and https://pypi.org/project/iam-units/ that the distributions are published.
 
 
 Generated data files for GWP contexts
@@ -69,3 +74,20 @@ Update these files using the command::
 
 The update submodule writes the context files.
 When adding a new context file, make sure to ``@import`` it in emissions.txt and expand the tests.
+
+
+Generated data files for currency conversions
+=============================================
+
+``iam_units/currency_data.py`` stores generated currency-conversion data for the
+supported ``(method, period)`` combinations. This module is committed and loaded at
+runtime without any dependency on ``sdmx1``.
+
+Update these files using::
+
+    $ python -m iam_units.update currency
+
+The current generator uses OECD Table 4 via ``sdmx1``. ``EUR`` rows are derived from the
+``DEU`` series in that table: this is exact for exchange-rate methods because Germany's
+national currency is EUR, but it is a substantive modeling choice for PPP methods and
+should remain explicit in code and documentation.

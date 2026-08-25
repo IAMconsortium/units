@@ -4,10 +4,19 @@
 
 import re
 
-GWP_VERSION = "0.7.0"
+GWP_VERSION = "0.9.3"
 
 # All available metrics usable with convert_gwp().
-METRICS = ["SARGWP100", "AR4GWP100", "AR5GWP100", "AR5CCFGWP100", "AR6GWP100"]
+METRICS = [
+    "SARGWP100",
+    "AR4GWP100",
+    "AR5GWP100",
+    "AR5CCFGWP100",
+    "AR6GWP100",
+    "AR6GWP20",
+    "AR6GWP500",
+    "AR6GTP100",
+]
 
 # All recognised emission species usable with convert_gwp(). See *pattern*.
 SPECIES = [
@@ -91,7 +100,6 @@ SPECIES = [
     "HFE365mcf3",
     "HFE374pc2",
     "HFE4310pccc124",
-    "HFE449sl",
     "HFE569sf2",
     "Halon1201",
     "Halon1202",

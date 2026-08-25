@@ -1,0 +1,56 @@
+[build-system]
+requires = ["build", "setuptools-scm"]
+
+[project]
+dynamic = ["version"]
+name = "iam_units"
+description = "Unit definitions for integrated-assessment research"
+authors = [{ name = "IAM-units contributors" }]
+maintainers = [
+  { name = "Paul Natsuo Kishimoto", email = "mail@paul.kishimoto.name" },
+]
+license = { file = "LICENSE" }
+readme = "README.rst"
+classifiers = [
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+requires-python = ">= 3.10"
+dependencies = ["pint >= 0.24.4"]
+
+[project.urls]
+homepage = "https://github.com/IAMconsortium/units"
+
+[project.optional-dependencies]
+update = ["globalwarmingpotentials", "sdmx1"]
+tests = ["iam_units[update]", "numpy", "pandas", "pytest", "pytest-cov"]
+
+[tool.mypy]
+files = ["iam_units"]
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["globalwarmingpotentials"]
+ignore_missing_imports = true
+
+[tool.ruff.lint]
+mccabe.max-complexity = 7
+select = ["C9", "E", "F", "I", "W"]
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools.package-data]
+iam_units = ["data/*.txt", "data/*/*.txt"]
+
+[tool.setuptools_scm]

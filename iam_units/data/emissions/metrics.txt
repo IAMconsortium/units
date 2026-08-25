@@ -10,3 +10,6 @@
 @import AR5GWP100.txt
 @import AR5CCFGWP100.txt
 @import AR6GWP100.txt
+@import AR6GWP20.txt
+@import AR6GWP500.txt
+@import AR6GTP100.txt

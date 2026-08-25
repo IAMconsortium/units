@@ -1,12 +1,38 @@
+import importlib
+import importlib.util
+from pathlib import Path
+
 import numpy as np
 import pint
 import pytest
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from pint.util import UnitsContainer
 
-from iam_units import convert_gwp, emissions, format_mass, registry
+import iam_units.update as update_module
+from iam_units import (
+    configure_currency,
+    convert_gwp,
+    emissions,
+    format_mass,
+    registry,
+)
+from iam_units.currency import METHOD
+from iam_units.update import _write_currency_module
 
 DEFAULTS = pint.get_application_registry()
+
+NIE = pytest.mark.xfail(raises=NotImplementedError)
+
+
+@pytest.fixture(scope="function")
+def local_registry() -> pint.UnitRegistry:
+    """A new registry with freshly-loaded definitions."""
+    loaded_registry: pint.UnitRegistry = pint.UnitRegistry()
+    loaded_registry.load_definitions(
+        str(Path(__file__).parent / "data" / "definitions.txt")
+    )
+    return loaded_registry
+
 
 # Parameters for test_units(), tuple of:
 # 1. A literal string to be parsed as a unit.
@@ -21,13 +47,18 @@ PARAMS = [
     ("tce", energy, True),
     ("toe", energy, False),
     ("EUR_2005", UnitsContainer({"[currency]": 1}), True),
+    (
+        "billion tkm/yr",
+        UnitsContainer({"[length]": 1, "[mass]": 1, "[time]": -1}),
+        True,
+    ),
 ]
 
 
 @pytest.mark.parametrize(
     "unit_str, dim, new_def", PARAMS, ids=lambda v: v if isinstance(v, str) else ""
 )
-def test_units(unit_str, dim, new_def):
+def test_units(unit_str, dim, new_def) -> None:
     if new_def:
         # Units defined in dimensions.txt are not recognized by base pint
         with pytest.raises(pint.UndefinedUnitError):
@@ -40,12 +71,12 @@ def test_units(unit_str, dim, new_def):
     assert registry("1 " + unit_str).dimensionality == dim
 
 
-def test_orders_of_magnitude():
+def test_orders_of_magnitude() -> None:
     # The registry recognizes units prefixed by an order of magnitude
     assert registry("1.2 billion EUR").to("million EUR").magnitude == 1.2e3
 
 
-def test_kt():
+def test_kt() -> None:
     # The registry should correctly interpret `kt` as a weight (not velocity)
     assert str(registry("1000 kt").to("Mt")) == "1.0 megametric_ton"
 
@@ -54,15 +85,114 @@ def test_kt():
         pint.UnitRegistry()("kt").to("Mt")
 
 
-def test_emissions_gwp_versions():
+@pytest.mark.parametrize(
+    "method, period",
+    (
+        ("PPPGDP", 2005),
+        (METHOD.PPPGDP, 2005),
+        ("EXC", 2010),
+        (METHOD.EXC, 2010),
+        # Invalid method str
+        pytest.param("FOO", 2005, marks=pytest.mark.xfail(raises=ValueError)),
+    ),
+)
+def test_currency(
+    local_registry: pint.UnitRegistry, method: METHOD | str, period: int
+) -> None:
+    configure_currency(method, period, _registry=local_registry)
+
+
+def test_currency_data_file(local_registry: pint.UnitRegistry) -> None:
+    configure_currency("EXC", 2005, _registry=local_registry)
+    quantity = local_registry("42.1 USD_2020")
+    converted = quantity.to("EUR_2005")
+
+    assert_almost_equal(converted.magnitude, 26.022132012144635)
+
+
+def test_currency_pppgdp_data_file(local_registry: pint.UnitRegistry) -> None:
+    configure_currency("PPPGDP", 2005, _registry=local_registry)
+    quantity = local_registry("42.1 USD_2020")
+    converted = quantity.to("EUR_2005")
+
+    assert converted.magnitude == pytest.approx(28.25337281882418)
+
+
+def test_currency_rejects_redefinition_with_different_method(
+    local_registry: pint.UnitRegistry,
+) -> None:
+    configure_currency("EXC", 2005, _registry=local_registry)
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "cannot change to method='PPPGDP' for already defined units: EUR_2005 "
+            r"\(configured with method='EXC'\)"
+        ),
+    ):
+        configure_currency("PPPGDP", 2005, _registry=local_registry)
+
+    converted = local_registry("42.1 USD_2020").to("EUR_2005")
+    assert converted.magnitude == pytest.approx(26.022132012144635)
+
+
+def test_currency_allows_idempotent_redefinition_with_same_method(
+    local_registry: pint.UnitRegistry,
+) -> None:
+    configure_currency("EXC", 2005, _registry=local_registry)
+    configure_currency("EXC", 2005, _registry=local_registry)
+
+    converted = local_registry("42.1 USD_2020").to("EUR_2005")
+    assert converted.magnitude == pytest.approx(26.022132012144635)
+
+
+def test_write_currency_module(tmp_path: Path) -> None:
+    path = tmp_path / "currency_data.py"
+    _write_currency_module(
+        path,
+        {("EXC", "2005"): (("EUR", "2005", 0.8038),)},
+    )
+
+    spec = importlib.util.spec_from_file_location("test_currency_data", path)
+    assert spec is not None
+    assert spec.loader is not None
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    assert module.DATA == {("EXC", "2005"): {("EUR", "2005"): 0.8038}}
+
+
+def test_update_currency(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    path = tmp_path / "currency_data.py"
+    monkeypatch.setattr(update_module, "CURRENCY_DATA_PATH", path)
+    monkeypatch.setattr(
+        update_module,
+        "_fetch_currency_rows_oecd",
+        lambda: {("EXC", "2005"): (("EUR", "2005", 0.8038),)},
+    )
+
+    update_module.currency()
+
+    spec = importlib.util.spec_from_file_location("test_generated_currency_data", path)
+    assert spec is not None
+    assert spec.loader is not None
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    assert module.DATA == {("EXC", "2005"): {("EUR", "2005"): 0.8038}}
+
+
+def test_emissions_gwp_versions() -> None:
     assert isinstance(emissions.GWP_VERSION, str)
 
 
-def test_emissions_metrics():
+def test_emissions_metrics() -> None:
     assert "SARGWP100" in emissions.METRICS
 
 
-def test_emissions_internal():
+def test_emissions_internal() -> None:
     # Dummy units can be created
     registry("0.5 _gwp").dimensionality == {"[_GWP]": 1.0}
 
@@ -81,11 +211,13 @@ def test_emissions_internal():
         "t {}",  # Mass
         "Mt {} / a",  # Mass rate
         "kt {} / (ha * yr)",  # Mass flux
+        "kt {} / J",  # Mass per unit energy
     ],
 )
 @pytest.mark.parametrize(
     "metric, species_in, species_out, expected_value",
     [
+        ("AR6GWP20", "CH4", "CO2", 81.2),
         ("AR6GWP100", "CH4", "CO2", 27.9),
         ("AR5CCFGWP100", "CH4", "CO2", 34),
         ("AR5GWP100", "CH4", "CO2", 28),
@@ -100,32 +232,34 @@ def test_emissions_internal():
         ("AR5GWP100", "HFC143a", "CO2", 4800.0),
     ],
 )
-def test_convert_gwp(units, metric, species_in, species_out, expected_value):
+def test_convert_gwp(
+    units: str, metric, species_in, species_out, expected_value
+) -> None:
     # Bare masses can be converted
-    qty = registry.Quantity(1.0, units.format(""))
+    qty0 = registry.Quantity(1.0, units.format(""))
     expected = registry(f"{expected_value} {units}")
 
-    observed = convert_gwp(metric, qty, species_in, species_out)
+    observed = convert_gwp(metric, qty0, species_in, species_out)
     assert observed.units == expected.units
     np.testing.assert_almost_equal(observed.magnitude, expected.magnitude)
 
     # '[mass] [speciesname] (/ [time])' can be converted; the input species is extracted
     # from the *qty* argument
-    qty = "1.0 " + units.format(species_in)
+    qty1 = "1.0 " + units.format(species_in)
     expected = registry(f"{expected_value} {units}")
 
-    observed = convert_gwp(metric, qty, species_out)
+    observed = convert_gwp(metric, qty1, species_out)
     assert observed.units == expected.units
     np.testing.assert_almost_equal(observed.magnitude, expected.magnitude)
 
     # Tuple of (vector magnitude, unit expression) can be converted where the
     # the unit expression contains the input species name
     arr = np.array([1.0, 2.5, 0.1])
-    qty = (arr, units.format(species_in))
+    qty2 = (arr, units.format(species_in))
     expected = arr * expected_value
 
     # Conversion works
-    result = convert_gwp(metric, qty, species_out)
+    result = convert_gwp(metric, qty2, species_out)
     # Magnitudes are as expected
     assert_array_almost_equal(result.magnitude, expected)
 
@@ -134,7 +268,7 @@ def test_convert_gwp(units, metric, species_in, species_out, expected_value):
     "context",
     ["AR5GWP100", None],
 )
-def test_convert_gwp_carbon(context):
+def test_convert_gwp_carbon(context) -> None:
     # CO2 can be converted to C
     qty = (44.0 / 12, "tonne CO2")
     result = convert_gwp(context, qty, "C")
@@ -161,11 +295,24 @@ def test_convert_gwp_carbon(context):
         ("gram / a", "CO₂-e (AR4)", ":~", "g CO₂-e (AR4) / a"),
     ],
 )
-def test_format_mass(units_in, species_str, spec, output):
+def test_format_mass(units_in, species_str, spec, output) -> None:
     # Quantity object can be formatted
-    qty = registry.Quantity(3.5, units_in)
-    assert format_mass(qty, species_str, spec) == output
+    qty0 = registry.Quantity(3.5, units_in)
+    assert format_mass(qty0, species_str, spec) == output
 
     # Unit object can be formatted
-    qty = registry.Unit(units_in)
-    assert format_mass(qty, species_str, spec) == output
+    qty1 = registry.Unit(units_in)
+    assert format_mass(qty1, species_str, spec) == output
+
+
+def test_import_warnings(caplog) -> None:
+    import iam_units
+
+    importlib.reload(iam_units)
+
+    pint_warning_logs = [
+        log
+        for log in caplog.records
+        if log.name == "pint.util" and log.levelname == "WARNING"
+    ]
+    assert len(pint_warning_logs) == 0

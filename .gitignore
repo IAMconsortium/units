@@ -1,11 +1,15 @@
 # Python
-*.egg-info
 __pycache__
 .benchmarks
+.dmypy*
+.mypy_cache
 .pytest_cache
+.ruff_cache
+*.egg-info
+*.eggs
 build
 dist
 
 # Editors
 .idea/*
-*.eggs
+.vscode

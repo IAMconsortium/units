@@ -1,15 +1,20 @@
 Unit definitions for integrated-assessment research
 ***************************************************
+|pypi| |gha| |coverage|
 
-.. image:: https://img.shields.io/pypi/v/iam-units.svg
+.. |pypi| image:: https://img.shields.io/pypi/v/iam-units.svg
    :target: https://pypi.python.org/pypi/iam-units/
    :alt: PyPI version
 
-.. image:: https://github.com/IAMconsortium/units/actions/workflows/test.yaml/badge.svg
+.. |gha| image:: https://github.com/IAMconsortium/units/actions/workflows/test.yaml/badge.svg
    :target: https://github.com/IAMconsortium/units/actions/workflows/test.yaml
    :alt: Build status
 
-© 2020–2021 `IAM-units authors`_; licensed under the `GNU GPL version 3`_.
+.. |coverage| image:: https://codecov.io/gh/IAMconsortium/units/branch/main/graph/badge.svg
+   :target: https://codecov.io/gh/IAMconsortium/units
+   :alt: Test coverage
+
+© 2020-2026 `IAM-units authors`_; licensed under the `GNU GPL version 3`_.
 
 The file `definitions.txt`_ gives `Pint`_-compatible definitions of energy, climate, and related units to supplement the SI and other units included in Pint's `default_en.txt`_.
 These definitions are used by:
@@ -52,6 +57,26 @@ To make the registry from this package the default:
     # Now used by default for pint top-level classes and methods
     >>> pint.Quantity('1.2 tce')
     1.2 <Unit('tonne_of_coal_equivalent')>
+
+Environment variables
+---------------------
+
+The package responds to two optional environment variables:
+
+``IAM_UNITS_CACHE``
+   iam-units caches the created registry using `pint's caching mechanism`_.
+   If set, this variable must contain the path of a directory for the cache.
+   If not set, a default path is used.
+
+``IAM_UNITS_CURRENCY``
+   If set, this variable must be a string like "EXC,2005".
+   The two parts, separated by a comma (","), are separated
+   and passed as the *method* and *period* arguments to ``configure_currency()``
+   (see below)
+   when iam-units is imported.
+   If not set, the function is not called.
+
+.. _pint's caching mechanism: https://pint.readthedocs.io/en/stable/advanced/performance.html#speed-up-registry-instantiation
 
 Warnings
 ========
@@ -141,6 +166,47 @@ See `<DEVELOPING.rst>`_ for details on updating the definitions.
 .. _Pint's formatting documentation: https://pint.readthedocs.io/en/latest/tutorial.html#string-formatting
 .. _globalwarmingpotentials: https://github.com/openclimatedata/globalwarmingpotentials
 
+Currency
+--------
+
+``iam_units`` defines deflators for:
+
+- USD (United States dollar) for annual periods from 2000 to 2022 inclusive.
+- EUR (Euro) for the periods 2005, 2010, 2015, 2020, and 2024 only.
+
+These can be used via pint-compatible unit expressions like ``USD_2019``
+that combine the `ISO 4217`_ alphabetic code with the time period.
+
+To enable conversions between *different* currencies, use the function ``configure_currency()``:
+
+.. code-block:: python
+
+   >>> configure_currency(method="EXC", period="2005")
+
+   # Then, for example
+   >>> qty = registry("42.1 USD_2020")
+   >>> qty
+   42.1 <Unit('USD_2020')>
+
+   >>> qty.to("EUR_2005")
+   26.022132012144635 <Unit('EUR_2005')>
+
+Calling ``configure_currency()`` again with the same method and currency/period pair on
+the same registry is a no-op. Calling it with a different method for an already
+configured pair raises ``ValueError`` rather than silently reusing the first definition.
+
+Currently ``iam_units`` supports:
+
+- annual OECD Table 4 exchange-rate / PPP methods ``EXC``, ``EXCE``, ``PPPGDP``,
+  ``PPPPRC``, and ``PPPP41``;
+- EUR for the periods 2005, 2010, 2015, 2020, and 2024; and
+- USD as the base currency for those conversions.
+
+Up to v2025.9.12, ``configure_currency("EXC", 2005)`` was called automatically.
+
+Contributions that extend the supported currencies, methods, and periods are welcome.
+
+.. _ISO 4217: https://en.wikipedia.org/wiki/ISO_4217#Active_codes_(List_One)
 
 Tests and development
 =====================
@@ -156,7 +222,7 @@ See `<DEVELOPING.rst>`_ for further details.
 .. _checks.csv: ./iam_units/data/checks.csv
 .. _Pint: https://pint.readthedocs.io
 .. _default_en.txt: https://github.com/hgrecco/pint/blob/master/pint/default_en.txt
-.. _MESSAGEix-GLOBIOM: https://docs.messageix.org
+.. _MESSAGEix-GLOBIOM: https://docs.messageix.org/models/
 .. _pyam: https://pyam-iamc.readthedocs.io
 .. _pyam.IamDataFrame.convert_unit(): https://pyam-iamc.readthedocs.io/en/stable/api/iamdataframe.html#pyam.IamDataFrame.convert_unit
 .. _issue: https://github.com/IAMconsortium/units/issues

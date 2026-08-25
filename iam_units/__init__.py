@@ -1,40 +1,50 @@
+import logging
+import os
+import sys
+from collections.abc import Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pint
 from pint.formatting import format_unit
 from pint.util import to_units_container
 
 from . import emissions
+from .currency import configure_currency
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+    from pint._typing import Scalar
 
 __all__ = [
     "convert_gwp",
+    "configure_currency",
     "format_mass",
     "registry",
 ]
 
 
-# Package registry using definitions.txt
-registry = pint.UnitRegistry()
-registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
-
-
-def convert_gwp(metric, quantity, *species):
-    """Convert *quantity* between GHG *species* with a GWP *metric*.
+def convert_gwp(
+    metric: str | None,
+    quantity: str | pint.Quantity | tuple["Scalar | Sequence[Scalar] | NDArray", str],
+    *species: str | None,
+) -> pint.Quantity:
+    """Convert `quantity` between GHG `species` with a GWP `metric`.
 
     Parameters
     ----------
     metric : str or None
-        Metric conversion factors to use. May be :obj:`None` if the input and
-        output species are the same.
-        Use :code:`iam_units.emissions.METRICS` for a list of available metrics.
+        Metric conversion factors to use. May be :obj:`None` if the input and output
+        species are the same. Use :code:`iam_units.emissions.METRICS` for a list of
+        available metrics.
     quantity : str or pint.Quantity or tuple
-        Quantity to convert. If a tuple of (magnitude, unit), these are passed
-        as arguments to :class:`pint.Quantity`.
+        Quantity to convert. If a tuple of (magnitude, unit), these are passed as
+        arguments to :class:`pint.Quantity`.
     species : sequence of str, length 1 or 2
-        Output, or (input, output) species symbols, e.g. ('CH4', 'CO2') to
-        convert mass of CH₄ to GWP-equivalent mass of CO₂. If only the output
-        species is provided, *quantity* must contain the symbol of the input
-        species in some location, e.g. '1.0 tonne CH4 / year'.
+        Output, or (input, output) species symbols, e.g. ('CH4', 'CO2') to convert mass
+        of CH₄ to GWP-equivalent mass of CO₂. If only the output species is provided,
+        `quantity` must contain the symbol of the input species in some location, e.g.
+        '1.0 tonne CH4 / year'.
 
     Returns
     -------
@@ -44,11 +54,11 @@ def convert_gwp(metric, quantity, *species):
     Notes
     -----
     The conversion factors are taken from the `globalwarmingpotentials` package,
-    see https://github.com/openclimatedata/globalwarmingpotentials.
-    You can use :code:`iam_units.emissions.GWP_VERSION` to check from which version
-    of that package the conversion tables in the `iam_units` package were generated.
+    see https://github.com/openclimatedata/globalwarmingpotentials. You can use
+    :code:`iam_units.emissions.GWP_VERSION` to check from which version of that package
+    the conversion tables in the `iam_units` package were generated.
     """
-    # Handle *species*: either (in, out) or only out
+    # Handle `species`: either (in, out) or only out
     try:
         species_in, species_out = species
     except ValueError:
@@ -56,27 +66,27 @@ def convert_gwp(metric, quantity, *species):
             raise ValueError("Must provide (from, to) or (to,) species")
         species_in, species_out = None, species[0]
 
-    # Split *quantity* if it is a tuple. After this step:
-    # - *mag* is the magnitude, or None.
-    # - *expr* is a string expression for either just the units, or the entire
-    #   quantity, including magnitude, as a str or pint.Quantity.
+    # Split `quantity` if it is a tuple. After this step:
+    # - `mag` is the magnitude, or None.
+    # - `expr` is a string expression for either just the units, or the entire quantity,
+    #   including magnitude, as a str or pint.Quantity.
     mag, expr = quantity if isinstance(quantity, tuple) else (None, quantity)
 
-    # If species_in wasn't provided, then *expr* must contain it
+    # If species_in wasn't provided, then `expr` must contain it
     if not species_in:
-        # Extract it using the regex, then re-assemble the expression for the
-        # units or whole quantity
-        q0, species_in, q1 = emissions.pattern.split(expr, maxsplit=1)
+        # Extract it using the regex, then re-assemble the expression for the units or
+        # whole quantity
+        q0, species_in, q1 = emissions.pattern.split(str(expr), maxsplit=1)
         expr = q0 + q1
 
-    # *metric* can only be None if the input and output species symbols are
-    # identical or equivalent
+    # `metric` can only be None if the input and output species symbols are identical or
+    # equivalent
     if metric is None:
         if species_in == species_out or any(
             {species_in, species_out} <= g for g in emissions.EQUIV
         ):
             metric = "AR5GWP100"
-        elif species_in in species_out:
+        elif species_out and species_in in species_out:
             # Eg. 'CO2' in 'CO2 / a'. This is both a DimensionalityError and a
             # ValueError (no metric); raise the former for pyam compat
             raise pint.DimensionalityError(species_in, species_out)
@@ -85,25 +95,28 @@ def convert_gwp(metric, quantity, *species):
             raise ValueError(msg)
 
     # Ensure a pint.Quantity object:
-    # - If *quantity* was a tuple, use the 2-arg constructor.
+    # - If `quantity` was a tuple, use the 2-arg constructor.
     # - If a str, use the 1-arg form to parse it.
     # - If already a pint.Quantity, this is a no-op.
     args = (expr,) if mag is None else (mag, expr)
     quantity = registry.Quantity(*args)
 
-    # Construct intermediate units with the same dimensionality as *quantity*,
-    # except '[mass]' replaced with the dummy unit '_gwp'
-    dummy = quantity.units / registry.Unit("tonne / _gwp")
+    # Construct intermediate units with the same dimensionality as `quantity`, except
+    # '[mass]' replaced with the dummy unit '_gwp'
+    m_dim = quantity.dimensionality["[mass]"]
+    dummy = quantity.units / registry.Unit(f"tonne ** {m_dim} / _gwp")
 
-    # Convert to dummy units using 'a' for the input species; then back to the
-    # input units using 'a' for the output species.
+    # Convert to dummy units using 'a' for the input species; then back to the input
+    # units using 'a' for the output species.
     return quantity.to(dummy, metric, _a=f"a_{species_in}").to(
         quantity.units, metric, _a=f"a_{species_out}"
     )
 
 
-def format_mass(obj, info, spec=None):
-    """Format the units of *obj* with *info* inserted after its mass unit.
+def format_mass(
+    obj: pint.Quantity | pint.Unit, info: str, spec: str | None = None
+) -> str:
+    """Format the units of `obj` with `info` inserted after its mass unit.
 
     Parameters
     ----------
@@ -114,28 +127,59 @@ def format_mass(obj, info, spec=None):
         Pint formatting specifier such as "H" (HTML format), "~C" (compact format with
         symbols), etc.
     """
-    spec = spec or obj.default_format
+    spec = spec or registry.formatter.default_format
 
-    try:
-        # Use only the units of a Quantity object
-        obj = obj.units
-    except AttributeError:
-        pass  # Already a Unit object
+    # Use only the units of a Quantity object
+    obj_units = obj.units if isinstance(obj, pint.Quantity) else obj
 
     # Use the symbol if the modifier "~" is in `spec`; else the canonical name. cf.
     # pint.Unit.__format__()
     method = registry._get_symbol if "~" in spec else lambda k: k
-    # Collect the pieces of the unit expression
-    units = [[method(key), value] for key, value in obj._units.items()]
+    # Collect the pieces of the unit expression: tuples of (unit string, exponent)
+    unit_power: list[tuple[str, "Scalar"]] = [
+        (method(unit), power) for unit, power in obj_units._units.items()
+    ]
 
     # Index of the mass component
-    mass_index = list(obj.dimensionality.keys()).index("[mass]")
+    index = list(obj_units.dimensionality.keys()).index("[mass]")
     # Append the information (e.g. species) to the mass component
-    units[mass_index][0] += f" {info}"
+    unit_power[index] = (f"{unit_power[index][0]} {info}", unit_power[index][1])
 
     # Prepare pint.util.UnitsContainer and hand off to pint's formatting. Discard "~"
     # (used above) and ":" (invalid in pint ≥0.18).
     return format_unit(
-        to_units_container(dict(units), registry=registry),
+        to_units_container(dict(unit_power), registry=registry),
         spec.replace("~", "").lstrip(":"),
     )
+
+
+def _initialize() -> pint.UnitRegistry:
+    from platformdirs import user_cache_path
+
+    # Identify cache folder: from environment variable, or default
+    cache_folder = os.environ.get("IAM_UNITS_CACHE", None) or user_cache_path(
+        "iam-units", version=f"{sys.version_info.major}.{sys.version_info.minor}"
+    )
+
+    # Create the registry, using a disk cache
+    registry: pint.UnitRegistry = pint.UnitRegistry(cache_folder=cache_folder)
+
+    # Quiet the pint logger per redefinition of units
+    pint_util_logger = logging.getLogger("pint.util")
+    original_pint_util_log_level = pint_util_logger.getEffectiveLevel()
+    pint_util_logger.setLevel(logging.ERROR)
+
+    # Load definitions.txt
+    registry.load_definitions(str(Path(__file__).parent / "data" / "definitions.txt"))
+
+    if value := os.environ.get("IAM_UNITS_CURRENCY", ""):
+        method, period = value.split(",")
+        configure_currency(method, period, _registry=registry)
+
+    # Restore level of pint.util logger
+    pint_util_logger.setLevel(original_pint_util_log_level)
+
+    return registry
+
+
+registry = _initialize()

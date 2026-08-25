@@ -9,6 +9,8 @@
     [_GWP] / [time] -> [mass] / [time]: value / (_a * _gwp / kg)
     [mass] / [time] / [area] -> [_GWP] / [time] / [area]: value * (_a * _gwp / kg)
     [_GWP] / [time] / [area] -> [mass] / [time] / [area]: value / (_a * _gwp / kg)
+    [time] ** 2 / [length] ** 2 -> [_GWP] * [time] ** 2 / [length] ** 2: value * (_a * _gwp)
+    [_GWP] * [time] ** 2 / [length] ** 2 -> [time] ** 2 / [length] ** 2: value / (_a * _gwp)
 
 
     a_C2F6 = 12200.0
@@ -59,7 +61,6 @@
     a_HFE347pcf2 = 580.0
     a_HFE356pcc3 = 110.0
     a_HFE4310pccc124 = 1870.0
-    a_HFE449sl = 297.0
     a_HFE569sf2 = 59.0
     a_Halon1211 = 1890.0
     a_Halon1301 = 7140.0
