@@ -226,7 +226,13 @@ def test_emissions_internal() -> None:
         ("SARGWP100", "CH4", "CO2", 21),
         # Same-species conversion with metric=None and compatible names
         (None, "CO2", "CO2_eq", 1.0),
-        (None, "CO2eq", "CO2e", 1.0),
+        (None, "CO2", "CO2e", 1.0),
+        (None, "CO2", "CO2eq", 1.0),
+        (None, "CO2", "CO2-eq", 1.0),
+        (None, "CO2_eq", "CO2", 1.0),
+        (None, "CO2e", "CO2", 1.0),
+        (None, "CO2eq", "CO2", 1.0),
+        (None, "CO2-eq", "CO2", 1.0),
         # Species names which are substrings of one another match correctly
         ("AR5GWP100", "HFC143", "CO2", 328.0),
         ("AR5GWP100", "HFC143a", "CO2", 4800.0),
