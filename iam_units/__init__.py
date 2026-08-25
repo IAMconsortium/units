@@ -78,11 +78,27 @@ def convert_gwp(
         # whole quantity
         q0, species_in, q1 = emissions.pattern.split(str(expr), maxsplit=1)
         expr = q0 + q1
+        
+    # Helper function to normalize CO2 variant names
+    def normalize_co2_variant(species: str) -> str:
+        """Normalize CO2 variant names to a canonical form."""
+        if species is None:
+            return None
+        # Replace underscores and hyphens, convert to lowercase for comparison
+        normalized = species.lower().replace("_", "").replace("-", "")
+        # Treat CO2, CO2e, CO2eq, CO2_eq, CO2-eq all as equivalent
+        if normalized in ("co2", "co2e", "co2eq"):
+            return "co2"
+        return species    
 
     # `metric` can only be None if the input and output species symbols are identical or
     # equivalent
     if metric is None:
-        if species_in == species_out or any(
+        # Normalize CO2 variants for comparison
+        normalized_in = normalize_co2_variant(species_in)
+        normalized_out = normalize_co2_variant(species_out)
+        
+        if normalized_in == normalized_out or any(
             {species_in, species_out} <= g for g in emissions.EQUIV
         ):
             metric = "AR5GWP100"
